@@ -32,6 +32,8 @@ function createNote(){ //creates the note with what was entered in the popup
             text: noteTitle
         }
 
+    
+
     const existingNotes = JSON.parse(localStorage.getItem('notes')) || []
     existingNotes.push(title)
     
@@ -53,10 +55,12 @@ function displayNotes(){
     notes.forEach(note => {
         const listItem = document.createElement('li')
         listItem.innerHTML = `
-        <span>${note.text}</span>
         <div id="noteBtns-container">
             <i class="fa-solid fa-pen-to-square" id="editBtn" onclick="editNote(${note.id})"></i>
             <i class="fa-solid fa-x"id="deleteBtn" onclick="deleteNote(${note.id})"></i>
+        </div>
+        <div id="title-container" onclick="openNotes()">
+            <span class="title">${note.text}</span>
         </div>
         `;
         notesList.appendChild(listItem)
@@ -70,7 +74,7 @@ function editNote(noteId){
     const editingPopup = document.createElement("div")
 
     editingPopup.innerHTML = `
-    <div id="editing-container" data-note-id="&{noteId}">
+    <div id="editing-container" data-note-id="${noteId}"> 
         <h1>Edit Note</h1>
         <textarea id="note-text">${noteText}</textarea>
         <div id="btn-container">
@@ -92,27 +96,27 @@ function closeEditPopup(){
 }
 
 function updateNote(){
-    const noteTitle = document.getElementById('note-text').nodeValue.trim()
+    const noteTitle = document.getElementById('note-text').value.trim()
     const editingPopup = document.getElementById('editing-container')
 
-    if(noteText !== ''){
+    if(noteTitle !== ''){
         const noteId = editingPopup.getAttribute('data-note-id')
         let notes = JSON.parse(localStorage.getItem('notes')) || []
 
         const updatedNotes = notes.map(note => {
-            if(note.id == noteID){
-                return {id: note.id, text: noteText}
+            if(note.id == noteId){
+                return {id: note.id, text: noteTitle}
             }
             return note;
         })
         
 
         localStorage.setItem('notes', JSON.stringify(updatedNotes))
-
-        editingPopup.remove()
-
-        displayNotes()
     }   
+
+    editingPopup.remove()
+
+    displayNotes()
 }
 
 function deleteNote(noteId){
@@ -123,24 +127,9 @@ function deleteNote(noteId){
     displayNotes()
 }
 
+//OVEr HReR
+function openNotes(){
+    window.location.href = ''
+}
+
 displayNotes()
-
-/*
-    document.body.appendChild(popupContainer)
-
-    const tab = document.createElement("div")
-    const deleteIcon = document.createElement("i")
-    const editIcon = document.createElement("i")
-
-    container.appendChild(tab)
-    tab.appendChild(deleteIcon)
-    tab.appendChild(editIcon)
-
-    tab.setAttribute("class", "tab")
-    deleteIcon.className = "fa-solid fa-x"
-    editIcon.className = "fa-solid fa-pen-to-square"
-
-    deleteIcon.addEventListener("click", deleteTab => {
-        tab.remove()
-    })
-    */
