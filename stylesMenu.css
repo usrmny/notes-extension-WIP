@@ -54,34 +54,25 @@ li{
                 -9px -9px 18px #ffffff;
 }
 
-#deleteNote {
+#title-container {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.title {
+    word-break: break-word;
+}
+
+#noteBtns-container{
     font-size: 15px;
-    position: relative;
-    top: 0;
-    cursor: pointer;
+    width: 150px;
+    display: flex;
+    justify-content: space-between;
 }
 
-
-#deleteNote .fa-x{
-    left: 90%;
-}
-
-#deleteNote .fa-pen-to-square{
-    left: -6%;
-}
-
-.tab span{
-    font-size: 12px;
-    flex-grow: 1;
-    word-wrap: break-word;
-    overflow-y: hidden;
-}
-
-.tab span:hover{
-    overflow-y:auto;
-}
-
-#popupContainer, #editContainer{
+#popupContainer, #editing-container{
     position: absolute;
     top: 50%;
     left: 50%;
@@ -103,7 +94,8 @@ li{
     display: flex;
 }
 
-#submitBtn {
+#submitBtn, #closeBtn {
+    background-color: gainsboro;
     width: 100px;
     font-size: 14px;
     border: none;
@@ -112,13 +104,10 @@ li{
     margin: 10px;
 }
 
-#closeBtn {
-    background-color: gainsboro;
-}
-
 textarea {
     resize: none;
     width: 60%;
     height: 30%;
     margin: 20px;
+    font-size: 20px;
 }
