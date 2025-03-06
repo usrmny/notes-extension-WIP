@@ -26,13 +26,11 @@ function closePopup(){
 function createNote(){ //creates the note with what was entered in the popup
     const popupContainer = document.getElementById('popupContainer')
     const noteTitle = document.getElementById('noteTitle').value //returns what was written
-    console.log(noteTitle)
     if(noteTitle.trim() !== ''){
         const title = {
             id: new Date().getTime(),
             text: noteTitle
         }
-    //} originally here
 
     const existingNotes = JSON.parse(localStorage.getItem('notes')) || []
     existingNotes.push(title)
@@ -57,8 +55,8 @@ function displayNotes(){
         listItem.innerHTML = `
         <span>${note.text}</span>
         <div id="noteBtns-container">
-            <button id="editBtn" onclick="editNote(${note.id})"></button>
-            <button id="deleteNote" onclick="deleteNote(${note.id})"></button>
+            <i class="fa-solid fa-pen-to-square" id="editBtn" onclick="editNote(${note.id})"></i>
+            <i class="fa-solid fa-x"id="deleteBtn" onclick="deleteNote(${note.id})"></i>
         </div>
         `;
         notesList.appendChild(listItem)
