@@ -15,7 +15,7 @@
     height: 100vh;
 }
 
-.addNote, .tab{
+.addNote, li{
     width: 150px;
     height: 225px;
     padding: 20px;
@@ -40,23 +40,33 @@
     color: gainsboro;
 }
 
-.tab{
+#notes-list {
+    list-style-type:none;
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    flex-wrap: wrap;
+    overflow: hidden;
+}
+
+li{
     box-shadow: 9px 9px 18px #b3b3b3,
                 -9px -9px 18px #ffffff;
 }
 
-.tab .fa-solid { 
+#deleteNote {
     font-size: 15px;
     position: relative;
     top: 0;
     cursor: pointer;
 }
 
-.tab .fa-x{
+
+#deleteNote .fa-x{
     left: 90%;
 }
 
-.tab .fa-pen-to-square{
+#deleteNote .fa-pen-to-square{
     left: -6%;
 }
 
@@ -74,7 +84,7 @@
 #popupContainer, #editContainer{
     position: absolute;
     top: 50%;
-    height: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
     height: 300px;
@@ -104,4 +114,11 @@
 
 #closeBtn {
     background-color: gainsboro;
+}
+
+textarea {
+    resize: none;
+    width: 60%;
+    height: 30%;
+    margin: 20px;
 }
