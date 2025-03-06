@@ -4,18 +4,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport">
-  <title>Mini Notes</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="miniNotes.js"></script>
+  <title>Mini Notes Menu</title>
+  <link rel="stylesheet" href="stylesMenu.css">
+  <script src="miniNotesMenu.js" defer></script>
   <script src="https://kit.fontawesome.com/12d75f143e.js" crossorigin="anonymous"></script>
 </head>
 
     <body>
         <main>
-            <div id="sorted"></div>
-            <div class="footer">
-                <i class="fa-solid fa-plus" onclick="addTask()"></i>
-                <i class="fa-solid fa-bars" onclick="openMenu()"></i>
+            <div id="container">
+                <div class="addNote" onclick="newTab()">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <ul id="notes-list"></ul>
             </div>
         </main>
     </body>
