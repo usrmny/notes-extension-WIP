@@ -9,23 +9,82 @@
     display: table;
 }
 
-.task, .footer  {
+.footer {
+    width:100%;
+    height:6vh;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#taskPopup{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: white;
+    border:2px solid rgb(185, 185, 185) ;
+}
+
+#taskPopup textarea {
+    width: 95%;
+    font-size: 18px;
+    resize: none;
+    overflow-y: scroll;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#createTask {
+    height: 25%;
+    margin: 20px 0;
+}
+
+#createTaskNote {
+    margin-bottom: 20px;
+}
+
+#createTaskNote, #createTaskSub {
+    height: 15%;
+}
+
+#taskPopupFooter {
+    margin: 20px 0 10px 0;
+    border-top: 2px solid grey;
+    width: 100%;
+    height: 25%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#taskPopupFooter i{
+    font-size: 22px;
+}
+
+.task  {
     width: 100%;
     height: 6vh;
     display: flex;
     align-items: center;
+    justify-content: center;
+    border: 2px solid black;
 }
 
-.footer {
-    justify-content: space-evenly;
-}
-
-.titlecss{
-    border: none;
-    width: 100%;
-    height: 100%;
+.checkbox {
     box-sizing: border-box;
-    resize: none;
+    transform: scale(2);
+    margin: 25px auto;
+    width: 7%;
+    height: 100%;
+}
+
+#taskText {
     font-size: 18px;
     font-family: 'Courier New', Courier, monospace;
     padding-left: 8px;
@@ -33,18 +92,12 @@
     overflow: hidden;
     white-space: pre-wrap;
     word-wrap: break-word;
+    display: inline;
 }
+
 
 .dragging {
     opacity: 30%;
-}
-
-.checkboxcss{
-    box-sizing: border-box;
-    margin-left: 4px;
-    width: 40px;
-    height: 50%;
-    
 }
 
 .fa-trash-can{
@@ -57,11 +110,6 @@
     height: 100%;
 }
 
-
-
-i, .checkboxcss{
-    cursor: pointer;
-}
 
 
 .checked {
