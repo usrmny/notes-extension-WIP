@@ -4,12 +4,12 @@ function addTask(){
     const taskPopup = document.createElement("div")
     taskPopup.innerHTML = `
         <div id="taskPopup">
-            <textarea id="createTask" placeholder="Add a task"></textarea>
-            <textarea id="createTaskNote" placeholder="Add note"></textarea>
-            <textarea id="createTaskSub" placeholder="Add subtask"></textarea>
-            <div id="taskFooter">
+            <textarea id="createTask" placeholder="Add a task..."></textarea>
+            <textarea id="createTaskNote" placeholder="Add a note..."></textarea>
+            <textarea id="createTaskSub" placeholder="Add a subtask..."></textarea>
+            <div id="taskPopupFooter">
                 <i class="fa-solid fa-arrow-left" onclick="cancelTask()"></i>
-                <i class="fa-regular fa-square-check" onclick="saveTask(${task.id})">Done</i>
+                <i class="fa-solid fa-square-check" onclick="saveTask()"></i>
             </div>
         </div>
     `;
@@ -24,18 +24,26 @@ function cancelTask(){
     }
 }
 
+function cancelEdit(){
+    const editPopup = document.getElementById("editPopup")
+
+    if(editPopup){
+        editPopup.remove()
+    }
+}
+
 function saveTask(){
     const taskPopup = document.getElementById("taskPopup")
     const taskText = document.getElementById("createTask").value.trim()
-    const taskNoteText = document.getElementById("createTaskNote").value.trim()
+    const taskNote = document.getElementById("createTaskNote").value.trim()
     const taskSubText = document.getElementById("createTaskSub").value.trim()
 
     if(taskText.trim() !== ''){
         const task = {
-            id: Date().getTime(),
+            id: new Date().getTime(),
             text: taskText,
-            note: taskNoteText,
-            subText: taskNoteText
+            note: taskNote,
+            subText: taskSubText
         } 
     
 
@@ -55,23 +63,18 @@ function saveTask(){
 function displayTasks(){
 
     const taskList = document.getElementById('list')
-    taskList = ''
+    taskList.innerHTML = ''
 
     const tasks = JSON.parse(localStorage.getItem('tasks')) || []
     tasks.forEach(task => {
+        task = document.createElement("li")
         task.innerHTML = `
-        <div id="taskPopup">
-            <p id="task" placeholder="Add a task..."></p>
-            <textarea id="taskNote" placeholder="Add note"></textarea>
-            <textarea id="taskSub" placeholder="Add subtask"></textarea>
-            <div id="taskFooter">
-                <i class="fa-solid fa-trash-can" onclick="removeTask(${task.id})">Delete</i>
-                <i class="fa-solid fa-pen-to-square" id="editBtn" onclick="editTask(${task.id})">Edit</i>
-                <i class="fa-regular fa-square-check" onclick="saveTask(${task.id})">Done</i>
-            </div>
-        </div>
+        <li id="task">
+            <input class="checkbox" type="checkbox" onclick="checkedTask()"/> 
+            <p id="taskText" placeholder="Add a task..." onclick="editTask(${task.id})">${task.id}</p>
+        </li>
     `;
-    taskList.appendChild(task)
+    taskList.appendChild(task)//undefined cuz no id given???
     })
 }
 
@@ -85,9 +88,23 @@ function removeTask(taskId){
     displayTasks()
 }
 
-function editTask(){}
+function editTask(taskId){
+    const editPopup = document.createElement("div")
+    editPopup.innerHTML = `
+        <div id="editPopup">
+            <textarea id="createTask" placeholder="Add a task">${taskId.text}</textarea>
+            <textarea id="createTaskNote" placeholder="Add note">${taskId.note}</textarea>
+            <textarea id="createTaskSub" placeholder="Add subtask">${taskId.subText}</textarea>
+            <div id="taskFooter">
+                <i class="fa-solid fa-arrow-left" onclick="cancelTask()"></i>
+                <i class="fa-regular fa-square-check" onclick="updateTask(${task.id})">Done</i>
+            </div>
+        </div>
+    `;
 
-function saveTask(){}
+    document.body.appendChild(editPopup)
+
+}
 
 function openMenu(){}
 
@@ -115,3 +132,18 @@ const allTasks = document.querySelectorAll(".task")
 
     box.addEventListener("dragover", initBox)
     box.addEventListener("dragenter", e => e.preventDefault())
+
+    /*
+    task.innerHTML = `
+        <div id="task">
+            <p id="taskText" placeholder="Add a task..."></p>
+            <p id="taskNote" placeholder="Add note"></p>
+            <p id="taskSubText" placeholder="Add subtask"></p>
+            <div id="taskFooter">
+                <i class="fa-solid fa-trash-can" onclick="removeTask(${task.id})">Delete</i>
+                <i class="fa-solid fa-pen-to-square" id="editBtn" onclick="editTask(${task.id})">Edit</i>
+                <i class="fa-regular fa-square-check" onclick="saveTask(${task.id})">Done</i>
+            </div>
+        </div>
+    `;
+    */
