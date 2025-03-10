@@ -17,7 +17,7 @@
     align-items: center;
 }
 
-#taskPopup{
+#taskPopup, #editPopup{
     position: absolute;
     top: 50%;
     left: 50%;
@@ -32,28 +32,30 @@
     border:2px solid rgb(185, 185, 185) ;
 }
 
-#taskPopup textarea {
+#taskPopup textarea, #editPopup textarea {
     width: 95%;
     font-size: 18px;
     resize: none;
     overflow-y: scroll;
     font-family: 'Courier New', Courier, monospace;
+    padding-left: 7px;
+    padding-top: 10px;
 }
 
-#createTask {
+#createTask, #editTask {
     height: 25%;
     margin: 20px 0;
 }
 
-#createTaskNote {
+#createTaskNote, #editTaskNote{
     margin-bottom: 20px;
 }
 
-#createTaskNote, #createTaskSub {
+#createTaskNote, #createTaskSub, #editTaskNote, #editTaskSub {
     height: 15%;
 }
 
-#taskPopupFooter {
+#taskPopupFooter, #editPopupFooter {
     margin: 20px 0 10px 0;
     border-top: 2px solid grey;
     width: 100%;
@@ -63,25 +65,24 @@
     align-items: center;
 }
 
-#taskPopupFooter i{
+#taskPopupFooter i, #editPopupFooter i{
     font-size: 22px;
 }
 
-.task  {
+#task  {
     width: 100%;
-    height: 6vh;
+    min-height: 6vh; 
     display: flex;
     align-items: center;
-    justify-content: center;
     border: 2px solid black;
+    flex-grow: 1; 
+    overflow: hidden; 
 }
 
 .checkbox {
     box-sizing: border-box;
     transform: scale(2);
-    margin: 25px auto;
-    width: 7%;
-    height: 100%;
+    margin: 25px;
 }
 
 #taskText {
@@ -89,7 +90,6 @@
     font-family: 'Courier New', Courier, monospace;
     padding-left: 8px;
     padding-top: 12px;
-    overflow: hidden;
     white-space: pre-wrap;
     word-wrap: break-word;
     display: inline;
@@ -99,17 +99,6 @@
 .dragging {
     opacity: 30%;
 }
-
-.fa-trash-can{
-    box-sizing: border-box;
-    margin-left: 5px;
-    position: relative;
-    top: 30%;
-    left: 10px;
-    width: 40px;
-    height: 100%;
-}
-
 
 
 .checked {
