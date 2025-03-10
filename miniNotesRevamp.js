@@ -67,14 +67,14 @@ function displayTasks(){
 
     const tasks = JSON.parse(localStorage.getItem('tasks')) || []
     tasks.forEach(task => {
-        task = document.createElement("li")
-        task.innerHTML = `
-        <li id="task">
+        const listItem = document.createElement("li")
+        listItem.innerHTML = `
+        <li id="task" onclick="editTask(${task.id})">
             <input class="checkbox" type="checkbox" onclick="checkedTask()"/> 
-            <p id="taskText" placeholder="Add a task..." onclick="editTask(${task.id})">${task.id}</p>
+            <p id="taskText" placeholder="Add a task...">${task.text}</p>
         </li>
     `;
-    taskList.appendChild(task)//undefined cuz no id given???
+    taskList.appendChild(listItem)
     })
 }
 
@@ -89,26 +89,53 @@ function removeTask(taskId){
 }
 
 function editTask(taskId){
+    const tasks = JSON.parse(localStorage.getItem('tasks'))||[]
+    const taskToEdit = tasks.find(task => task.id == taskId)
+    const taskText = taskToEdit ? taskToEdit.text : ''
+    const taskNote = taskToEdit ? taskToEdit.note : ''
+    const taskTextSub = taskToEdit ? taskToEdit.subText : ''
+
     const editPopup = document.createElement("div")
     editPopup.innerHTML = `
         <div id="editPopup">
-            <textarea id="createTask" placeholder="Add a task">${taskId.text}</textarea>
-            <textarea id="createTaskNote" placeholder="Add note">${taskId.note}</textarea>
-            <textarea id="createTaskSub" placeholder="Add subtask">${taskId.subText}</textarea>
-            <div id="taskFooter">
-                <i class="fa-solid fa-arrow-left" onclick="cancelTask()"></i>
-                <i class="fa-regular fa-square-check" onclick="updateTask(${task.id})">Done</i>
+            <textarea id="editTask" placeholder="Add a task">${taskText}</textarea>
+            <textarea id="editTaskNote" placeholder="Add note">${taskNote}</textarea>
+            <textarea id="editTaskSub" placeholder="Add subtask">${taskTextSub}</textarea>
+            <div id="editPopupFooter">
+                <i class="fa-solid fa-arrow-left" onclick="cancelEdit()"></i>
+                <i class="fa-solid fa-square-check" onclick="updateTask(${taskId})"></i>
             </div>
         </div>
     `;
 
     document.body.appendChild(editPopup)
+}
 
+function updateTask(taskId){
+    const editingPopup = document.getElementById("editPopup")
+    let tasks = JSON.parse(localStorage.getItem('tasks'))||[]
+    
+    const updatedTasks = tasks.map(task => {
+        if(task.id == taskId){
+            return{
+                id: task.id, 
+                text: document.getElementById("editTask").value,
+                note: document.getElementById("editTaskNote").value,
+                subText: document.getElementById("editTaskSub").value
+            }
+        }
+        else return task
+    })
+
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks))
+
+    editingPopup.remove()
+    displayTasks()
 }
 
 function openMenu(){}
 
-const allTasks = document.querySelectorAll(".task")
+const allTasks = document.querySelectorAll("#task")
     allTasks.forEach(task => {
         task.addEventListener("dragstart", () => {
             setTimeout(() => task.classList.add("dragging"), 0)
@@ -132,18 +159,3 @@ const allTasks = document.querySelectorAll(".task")
 
     box.addEventListener("dragover", initBox)
     box.addEventListener("dragenter", e => e.preventDefault())
-
-    /*
-    task.innerHTML = `
-        <div id="task">
-            <p id="taskText" placeholder="Add a task..."></p>
-            <p id="taskNote" placeholder="Add note"></p>
-            <p id="taskSubText" placeholder="Add subtask"></p>
-            <div id="taskFooter">
-                <i class="fa-solid fa-trash-can" onclick="removeTask(${task.id})">Delete</i>
-                <i class="fa-solid fa-pen-to-square" id="editBtn" onclick="editTask(${task.id})">Edit</i>
-                <i class="fa-regular fa-square-check" onclick="saveTask(${task.id})">Done</i>
-            </div>
-        </div>
-    `;
-    */
