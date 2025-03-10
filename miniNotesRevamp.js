@@ -43,7 +43,8 @@ function saveTask(){
             id: new Date().getTime(),
             text: taskText,
             note: taskNote,
-            subText: taskSubText
+            subText: taskSubText,
+            checked: false
         } 
     
 
@@ -69,16 +70,52 @@ function displayTasks(){
     tasks.forEach(task => {
         const listItem = document.createElement("li")
         listItem.innerHTML = `
-        <li id="task" onclick="editTask(${task.id})">
-            <input class="checkbox" type="checkbox" onclick="checkedTask()"/> 
-            <p id="taskText" placeholder="Add a task...">${task.text}</p>
-        </li>
-    `;
+            <li id="task" onclick="editTask(${task.id})">
+                <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
+                <p id="taskText" class="unchecked" placeholder="Add a task...">${task.text}</p>
+            </li>
+            `;
+        const text = listItem.querySelector('p')
+        if(task.checked){
+            text.setAttribute("class", "checked")
+        }
+        else{
+            text.setAttribute("class", "unchecked")
+        }
     taskList.appendChild(listItem)
     })
 }
 
-function boxClicked(){}
+function boxClicked(taskId){
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || []
+    const taskChecked = tasks.find(task => task.id == taskId)
+
+        var updatedChecks = tasks.map(task => {
+            if(task.id == taskId && taskChecked.checked == false){
+                return{
+                    id: task.id, 
+                    text: task.text,
+                    note: task.note,
+                    subText: task.subText,
+                    checked: true
+                }
+            }
+            else if (task.id == taskId && taskChecked.checked == true){
+                return{
+                    id: task.id, 
+                    text: task.text,
+                    note: task.note,
+                    subText: task.subText,
+                    checked: false
+                }
+            }
+            else return task
+        })
+
+    localStorage.setItem('tasks', JSON.stringify(updatedChecks))
+    displayTasks()
+
+}
 
 function removeTask(taskId){
     let tasks = JSON.parse(localStorage.getItem('tasks')) || []
@@ -121,7 +158,8 @@ function updateTask(taskId){
                 id: task.id, 
                 text: document.getElementById("editTask").value,
                 note: document.getElementById("editTaskNote").value,
-                subText: document.getElementById("editTaskSub").value
+                subText: document.getElementById("editTaskSub").value,
+                checked: task.checked
             }
         }
         else return task
@@ -159,3 +197,5 @@ const allTasks = document.querySelectorAll("#task")
 
     box.addEventListener("dragover", initBox)
     box.addEventListener("dragenter", e => e.preventDefault())
+
+displayTasks()
