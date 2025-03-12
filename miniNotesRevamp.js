@@ -61,6 +61,8 @@ function saveTask(){
     displayTasks()
 }
 
+
+//Buttons don't change appearance without '${task.checked ? 'checked' : ''}'???
 function displayTasks(){
 
     const taskList = document.getElementById('list')
@@ -68,11 +70,11 @@ function displayTasks(){
 
     const tasks = JSON.parse(localStorage.getItem('tasks')) || []
     tasks.forEach(task => {
-        const listItem = document.createElement("li")
+        const listItem = document.createElement("li") 
         listItem.innerHTML = `
-            <li id="task" onclick="editTask(${task.id})">
+            <li id="task" draggable="true">
                 <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
-                <p id="taskText" class="unchecked" placeholder="Add a task...">${task.text}</p>
+                <p id="taskText" class="unchecked" onclick="editTask(${task.id})" placeholder="Add a task...">${task.text} </p>
             </li>
             `;
         const text = listItem.querySelector('p')
@@ -82,7 +84,9 @@ function displayTasks(){
         else{
             text.setAttribute("class", "unchecked")
         }
-    taskList.appendChild(listItem)
+
+        listItem.addEventListener('drag', draggingTask(listItem, listItem.id))
+        taskList.appendChild(listItem)
     })
 }
 
@@ -119,9 +123,10 @@ function boxClicked(taskId){
 
 function removeTask(taskId){
     let tasks = JSON.parse(localStorage.getItem('tasks')) || []
-    tasks.filter(task => task.id !== taskId)
+    tasks = tasks.filter(task => task.id !== taskId)
     localStorage.setItem('tasks', JSON.stringify(tasks))
 
+    document.getElementById("editPopup").remove()
     displayTasks()
 }
 
@@ -140,6 +145,7 @@ function editTask(taskId){
             <textarea id="editTaskSub" placeholder="Add subtask">${taskTextSub}</textarea>
             <div id="editPopupFooter">
                 <i class="fa-solid fa-arrow-left" onclick="cancelEdit()"></i>
+                <i class="fa-solid fa-trash-can" onclick="removeTask(${taskId})"></i>
                 <i class="fa-solid fa-square-check" onclick="updateTask(${taskId})"></i>
             </div>
         </div>
@@ -171,31 +177,31 @@ function updateTask(taskId){
     displayTasks()
 }
 
-function openMenu(){}
+//gotta save new positions when done (use array of siblings?)
+function draggingTask(e, taskId){
+    e.classList.add("dragging")
 
-const allTasks = document.querySelectorAll("#task")
-    allTasks.forEach(task => {
-        task.addEventListener("dragstart", () => {
-            setTimeout(() => task.classList.add("dragging"), 0)
-        })
-        task.addEventListener("dragend", () => {
-            task.classList.remove("dragging")
-        })
+    e.addEventListener("dragend", () => {
+        e.classList.remove("dragging")
     })
 
     const initBox = (e) => {
         e.preventDefault()
         const draggingItem = box.querySelector(".dragging")
-        const siblings = [...document.querySelectorAll(".task:not(.dragging)")]
+        const siblings = [...document.querySelectorAll("#task:not(.dragging)")]
 
         let nextSibling = siblings.find(sibling => {
             return e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2
         })
 
-        box.insertBefore(draggingItem, nextSibling)
+       // box.insertBefore(draggingItem, nextSibling)
+       draggingItem.insertAdjacentElement("beforebegin", nextSibling)
     }
 
     box.addEventListener("dragover", initBox)
     box.addEventListener("dragenter", e => e.preventDefault())
+}
+
+function openMenu(){}
 
 displayTasks()
