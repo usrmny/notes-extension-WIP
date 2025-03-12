@@ -89,12 +89,18 @@
     font-size: 18px;
     font-family: 'Courier New', Courier, monospace;
     padding-left: 8px;
-    padding-top: 12px;
     white-space: pre-wrap;
     word-wrap: break-word;
     display: inline;
+    width: 100%;
+    height: 100%;
 }
 
+#task .fa-grip-lines{
+    margin: 20px;
+    padding: 10px;
+    font-size: 22px;
+}
 
 .dragging {
     opacity: 30%;
