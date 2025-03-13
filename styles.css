@@ -103,6 +103,14 @@
 }
 
 .dragging {
+    border: 2px solid black;
+    box-shadow: 2px black;
+    opacity: 30%;
+    padding: 10px;
+    background: grey;
+}
+
+.hovering{
     opacity: 30%;
 }
 
