@@ -1,4 +1,12 @@
 const box = document.getElementById("list")
+/*
+document.body.addEventListener('keydown', (e) => {
+    if (e.altKey && 'ws'.indexOf(e.key) !== -1) {
+      e.preventDefault();
+    }
+  });
+  */
+document.addEventListener("keydown", keybinds)
 
 function addTask(){
     const taskPopup = document.createElement("div")
@@ -72,7 +80,7 @@ function displayTasks(){
     tasks.forEach(task => {
         const listItem = document.createElement("li") 
         listItem.innerHTML = `
-            <li id="task" draggable="true">
+            <li id="task">
                 <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
                 <p id="taskText" class="unchecked" onclick="editTask(${task.id})" placeholder="Add a task...">${task.text} </p>
             </li>
@@ -85,7 +93,6 @@ function displayTasks(){
             text.setAttribute("class", "unchecked")
         }
 
-        listItem.addEventListener('drag', draggingTask(listItem, listItem.id))
         taskList.appendChild(listItem)
     })
 }
@@ -94,7 +101,8 @@ function boxClicked(taskId){
     let tasks = JSON.parse(localStorage.getItem('tasks')) || []
     const taskChecked = tasks.find(task => task.id == taskId)
 
-        var updatedChecks = tasks.map(task => {
+        //was var...
+        let updatedChecks = tasks.map(task => {
             if(task.id == taskId && taskChecked.checked == false){
                 return{
                     id: task.id, 
@@ -177,9 +185,102 @@ function updateTask(taskId){
     displayTasks()
 }
 
-//gotta save new positions when done (use array of siblings?)
-function draggingTask(e, taskId){
+let count = 0
+let index = 0
+
+function keybinds(e){
+
+    let tasks = [...document.querySelectorAll("#task")]
+    console.log(box.children)
+    console.log(box.childElementCount)
+
+    if(e.altKey){
+        e.preventDefault()
+        tasks[index].classList.add("hovering")
+
+        if(count === 0){
+            switch(e.key){
+                case "w":
+                    if(!(tasks[0].classList.contains("hovering"))){
+                        tasks[index].classList.remove("hovering")
+                        tasks[--index].classList.add("hovering")
+                    }
+                    break;
+                case "s":
+                    if(!(tasks[tasks.length-1].classList.contains("hovering"))){
+                        tasks[index].classList.remove("hovering")
+                        tasks[++index].classList.add("hovering")
+                    }
+                    break;
+            }
+        }
+
+        if(e.key === "Enter" && (tasks[index].classList.contains("hovering"))){
+            count++
+            tasks[index].classList.remove("hovering")
+            tasks[index].classList.add("dragging")
+        }
+
+        if(count === 1){
+            switch(e.key){
+                case "w":
+                    if(index > 0){
+                        const prevSibling = tasks[index - 1]
+                        tasks = [...document.querySelectorAll("#task")]
+                        if (box.contains(prevSibling)) {
+                            console.log("")
+                            console.log(box)
+                            console.log(prevSibling)
+                            console.log(tasks[index])
+                            console.log("...haha") //???? THIS APPEARS YET ERROR OCCURS ????
+                            //box.insertBefore(tasks[index], prevSibling)
+                            prevSibling.insertAdjacentElement('beforebegin', tasks[index]) //THIS WORKS!!!! 
+
+                        } 
+                        //tasks[index].insertAdjacentHTML("beforebegin", prevSibling) //even worse
+                        index--
+                        //tasks = [...document.querySelectorAll("#task")]
+                    }
+                    break
+                case "s":
+                    if(index < tasks.length){
+                        var nextSibling = tasks[index + 1]
+                        tasks = [...document.querySelectorAll("#task")]
+                        box.insertBefore(tasks[index], tasks[index])
+                        index++
+                       // tasks = [...document.querySelectorAll("#task")]
+                    }
+                    break;
+            }
+        }
+            
+    }
+    else{
+        tasks.forEach(task => {
+            task.classList.remove("hovering")
+            task.classList.remove("dragging")
+        })
+        count = 0
+        index = 0 // can remove
+    }
+    
+    //document.addEventListener("keydown")
+}
+
+function openMenu(){}
+
+displayTasks()
+
+
+
+
+
+//insertBefore keeps throwing an error saying nextSibling is not a child node of box...
+//may come back to this some day... will replace with arrow keybinds for now.
+/*
+function draggingTask(e){
     e.classList.add("dragging")
+    
 
     e.addEventListener("dragend", () => {
         e.classList.remove("dragging")
@@ -194,14 +295,23 @@ function draggingTask(e, taskId){
             return e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2
         })
 
-       // box.insertBefore(draggingItem, nextSibling)
-       draggingItem.insertAdjacentElement("beforebegin", nextSibling)
+        let newOrder = [...document.querySelectorAll("#task")]
+        let tasks = JSON.parse(localStorage.getItem('tasks'))||[]
+        const updatedTasks = tasks.map(task => {
+             return{
+                    id: newOrder.indexOf(task.id),
+                    text: task.text,
+                    note: task.note,
+                    subText: task.subText,
+                    checked: task.checked
+            }
+        })
+        localStorage.setItem('tasks', JSON.stringify(updatedTasks))
+        box.insertBefore(draggingItem, nextSibling);
+
     }
 
     box.addEventListener("dragover", initBox)
     box.addEventListener("dragenter", e => e.preventDefault())
 }
-
-function openMenu(){}
-
-displayTasks()
+*/
