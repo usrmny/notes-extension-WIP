@@ -40,6 +40,7 @@ function cancelEdit(){
     }
 }
 
+let item = 0
 function saveTask(){
     const taskPopup = document.getElementById("taskPopup")
     const taskText = document.getElementById("createTask").value.trim()
@@ -52,7 +53,8 @@ function saveTask(){
             text: taskText,
             note: taskNote,
             subText: taskSubText,
-            checked: false
+            checked: false,
+            item: item++
         } 
     
 
@@ -79,11 +81,12 @@ function displayTasks(){
     const tasks = JSON.parse(localStorage.getItem('tasks')) || []
     tasks.forEach(task => {
         const listItem = document.createElement("li") 
+        listItem.setAttribute("id", "task")
+        listItem.setAttribute("item-id", task.item)
+        //listItem.setAttribute("draggable", true)
         listItem.innerHTML = `
-            <li id="task">
-                <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
-                <p id="taskText" class="unchecked" onclick="editTask(${task.id})" placeholder="Add a task...">${task.text} </p>
-            </li>
+            <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
+            <p id="taskText" class="unchecked" onclick="editTask(${task.id})" placeholder="Add a task...">${task.text} </p>
             `;
         const text = listItem.querySelector('p')
         if(task.checked){
@@ -103,22 +106,14 @@ function boxClicked(taskId){
 
         //was var...
         let updatedChecks = tasks.map(task => {
-            if(task.id == taskId && taskChecked.checked == false){
+            if(task.id == taskId){
                 return{
                     id: task.id, 
                     text: task.text,
                     note: task.note,
                     subText: task.subText,
-                    checked: true
-                }
-            }
-            else if (task.id == taskId && taskChecked.checked == true){
-                return{
-                    id: task.id, 
-                    text: task.text,
-                    note: task.note,
-                    subText: task.subText,
-                    checked: false
+                    checked: !taskChecked.checked, 
+                    item: task.item
                 }
             }
             else return task
@@ -173,7 +168,8 @@ function updateTask(taskId){
                 text: document.getElementById("editTask").value,
                 note: document.getElementById("editTaskNote").value,
                 subText: document.getElementById("editTaskSub").value,
-                checked: task.checked
+                checked: task.checked,
+                item: task.item
             }
         }
         else return task
@@ -189,10 +185,7 @@ let count = 0
 let index = 0
 
 function keybinds(e){
-
     let tasks = [...document.querySelectorAll("#task")]
-    console.log(box.children)
-    console.log(box.childElementCount)
 
     if(e.altKey){
         e.preventDefault()
@@ -216,56 +209,114 @@ function keybinds(e){
         }
 
         if(e.key === "Enter" && (tasks[index].classList.contains("hovering"))){
-            count++
+            count = 1
             tasks[index].classList.remove("hovering")
             tasks[index].classList.add("dragging")
+            console.log("count = 1")
         }
 
         if(count === 1){
             switch(e.key){
                 case "w":
                     if(index > 0){
-                        const prevSibling = tasks[index - 1]
+                        let prevSibling = tasks[index - 1]
                         tasks = [...document.querySelectorAll("#task")]
-                        if (box.contains(prevSibling)) {
-                            console.log("")
-                            console.log(box)
-                            console.log(prevSibling)
-                            console.log(tasks[index])
-                            console.log("...haha") //???? THIS APPEARS YET ERROR OCCURS ????
-                            //box.insertBefore(tasks[index], prevSibling)
-                            prevSibling.insertAdjacentElement('beforebegin', tasks[index]) //THIS WORKS!!!! 
-
-                        } 
-                        //tasks[index].insertAdjacentHTML("beforebegin", prevSibling) //even worse
+                        box.insertBefore(tasks[index], prevSibling)
+                        //prevSibling.insertAdjacentElement('beforebegin', tasks[index]) //THIS WORKS!!!!
+                        console.log(tasks[index].getAttribute('item-id') + " " + prevSibling.getAttribute('item-id')) 
                         index--
-                        //tasks = [...document.querySelectorAll("#task")]
+
                     }
-                    break
+                    break;
+                    //CAN'T GO DOWN???
                 case "s":
                     if(index < tasks.length){
-                        var nextSibling = tasks[index + 1]
+                        let nextSibling = tasks[index + 1]
                         tasks = [...document.querySelectorAll("#task")]
-                        box.insertBefore(tasks[index], tasks[index])
+                        //nextSibling.insertAdjacentElement('beforebegin', tasks[index])
+                        box.insertBefore(tasks[index], nextSibling)
+                        console.log(tasks[index].getAttribute('item-id') + " " + nextSibling.getAttribute('item-id'))
                         index++
-                       // tasks = [...document.querySelectorAll("#task")]
                     }
+                    break;
+                case "ArrowRight":
+                    count = 2
+                    console.log("count = 2")
                     break;
             }
         }
+
+        if(count === 2) savePosition()
             
     }
     else{
+        //remove dragging/hovering should happen without user needed to press again...display tasks remove there?
         tasks.forEach(task => {
             task.classList.remove("hovering")
             task.classList.remove("dragging")
         })
-        count = 0
-        index = 0 // can remove
     }
     
     //document.addEventListener("keydown")
 }
+
+//NOT WORKING
+function savePosition(){
+    //let i = 0
+    let index = 0
+    let tasksHtml = [...document.querySelectorAll("#task")]
+    let tasksJson = JSON.parse(localStorage.getItem('tasks'))||[]
+   // console.log(tasksHtml)
+   // console.log(tasksJson)
+
+    const updatedTasks = tasksJson.map(taskJson => {
+       // console.log("taskJson.item" + taskJson.item)
+       // console.log("taskHtml[index]" + index + ": " + tasksHtml[index].getAttribute('item-id'))
+
+        //tasksJson.forEach(task => {
+          //  let taskElement = document.querySelector(`#task[item-id='${task.item}']`);
+           // console.log(taskElement)
+
+
+            //task[i].getAttribute('item-id')
+            //if(String(task.item) === tasksHtml[i].getAttribute('item-id')){
+             //   console.log(String(task.item) + " : " + tasksHtml[i].getAttribute('item-id') + "   they can be compared")
+        // }
+       // })findTaskHtml(taskJson.item)
+
+
+
+        //loses value in this if statement
+        if(String(taskJson.item) !== tasksHtml[index++].getAttribute('item-id')){ 
+            let wanted = tasksJson.find(task => String(task.item) === tasksHtml[index - 1].getAttribute('item-id'))
+            console.log(wanted)
+            taskJson = tasksJson.filter(task => String(task.item) === String(wanted.item)) 
+
+            return {
+                id: taskJson[0].id, 
+                text: taskJson[0].text, 
+                note: taskJson[0].note,
+                subText: taskJson[0].subText,
+                checked: taskJson[0].checked,
+                item: index
+            }
+        }
+        else return taskJson //this works
+    })
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks))
+    count = 0
+    displayTasks()  
+}
+
+/*
+function findTaskHtml(itemId){
+    let tasksHtml = [...document.querySelectorAll("#task")]
+    let temp = tasksHtml.filter(task => task.getAttribute('item-id') === String(itemId))
+
+    //console.log("found: " + temp.getAttribute('item-id'))
+    return temp[0].getAttribute('item-id') 
+}
+*/
 
 function openMenu(){}
 
