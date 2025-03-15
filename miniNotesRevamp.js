@@ -1,17 +1,17 @@
 const box = document.getElementById("list")
-/*
+
 document.body.addEventListener('keydown', (e) => {
     if (e.altKey && 'ws'.indexOf(e.key) !== -1) {
       e.preventDefault();
     }
+    if(e.altKey)document.addEventListener("keydown", moveTask)
   });
-  */
-document.addEventListener("keydown", keybinds)
 
 function addTask(){
-    const taskPopup = document.createElement("div")
-    taskPopup.innerHTML = `
-        <div id="taskPopup">
+    if(document.getElementById('taskPopup') === null && document.getElementById('editPopup') === null){
+        const taskPopup = document.createElement("div")
+        taskPopup.setAttribute("id", "taskPopup")
+        taskPopup.innerHTML = `
             <textarea id="createTask" placeholder="Add a task..."></textarea>
             <textarea id="createTaskNote" placeholder="Add a note..."></textarea>
             <textarea id="createTaskSub" placeholder="Add a subtask..."></textarea>
@@ -19,25 +19,19 @@ function addTask(){
                 <i class="fa-solid fa-arrow-left" onclick="cancelTask()"></i>
                 <i class="fa-solid fa-square-check" onclick="saveTask()"></i>
             </div>
-        </div>
-    `;
-    document.body.appendChild(taskPopup)
+        `;
+        document.body.appendChild(taskPopup)
+    }
 }
 
 function cancelTask(){
     const taskPopup = document.getElementById("taskPopup")
-
-    if(taskPopup){
-        taskPopup.remove()
-    }
+    if(taskPopup) taskPopup.remove()
 }
 
 function cancelEdit(){
     const editPopup = document.getElementById("editPopup")
-
-    if(editPopup){
-        editPopup.remove()
-    }
+    if(editPopup) editPopup.remove()
 }
 
 let item = 0
@@ -88,13 +82,10 @@ function displayTasks(){
             <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
             <p id="taskText" class="unchecked" onclick="editTask(${task.id})" placeholder="Add a task...">${task.text} </p>
             `;
+
         const text = listItem.querySelector('p')
-        if(task.checked){
-            text.setAttribute("class", "checked")
-        }
-        else{
-            text.setAttribute("class", "unchecked")
-        }
+        if(task.checked) text.setAttribute("class", "checked")
+        else text.setAttribute("class", "unchecked")
 
         taskList.appendChild(listItem)
     })
@@ -104,7 +95,6 @@ function boxClicked(taskId){
     let tasks = JSON.parse(localStorage.getItem('tasks')) || []
     const taskChecked = tasks.find(task => task.id == taskId)
 
-        //was var...
         let updatedChecks = tasks.map(task => {
             if(task.id == taskId){
                 return{
@@ -121,7 +111,6 @@ function boxClicked(taskId){
 
     localStorage.setItem('tasks', JSON.stringify(updatedChecks))
     displayTasks()
-
 }
 
 function removeTask(taskId){
@@ -134,15 +123,16 @@ function removeTask(taskId){
 }
 
 function editTask(taskId){
-    const tasks = JSON.parse(localStorage.getItem('tasks'))||[]
-    const taskToEdit = tasks.find(task => task.id == taskId)
-    const taskText = taskToEdit ? taskToEdit.text : ''
-    const taskNote = taskToEdit ? taskToEdit.note : ''
-    const taskTextSub = taskToEdit ? taskToEdit.subText : ''
+    if(document.getElementById('taskPopup') === null && document.getElementById('editPopup') === null){
+        const tasks = JSON.parse(localStorage.getItem('tasks'))||[]
+        const taskToEdit = tasks.find(task => task.id == taskId)
+        const taskText = taskToEdit ? taskToEdit.text : ''
+        const taskNote = taskToEdit ? taskToEdit.note : ''
+        const taskTextSub = taskToEdit ? taskToEdit.subText : ''
 
-    const editPopup = document.createElement("div")
-    editPopup.innerHTML = `
-        <div id="editPopup">
+        const editPopup = document.createElement("div")
+        editPopup.setAttribute("id", "editPopup")
+        editPopup.innerHTML = `
             <textarea id="editTask" placeholder="Add a task">${taskText}</textarea>
             <textarea id="editTaskNote" placeholder="Add note">${taskNote}</textarea>
             <textarea id="editTaskSub" placeholder="Add subtask">${taskTextSub}</textarea>
@@ -151,10 +141,10 @@ function editTask(taskId){
                 <i class="fa-solid fa-trash-can" onclick="removeTask(${taskId})"></i>
                 <i class="fa-solid fa-square-check" onclick="updateTask(${taskId})"></i>
             </div>
-        </div>
-    `;
-
-    document.body.appendChild(editPopup)
+        `;
+        document.body.appendChild(editPopup)
+        //document.addEventListener('keydown', typingKeybindsEdit(taskId))
+    }
 }
 
 function updateTask(taskId){
@@ -184,14 +174,14 @@ function updateTask(taskId){
 let count = 0
 let index = 0
 
-function keybinds(e){
+function moveTask(e){
     let tasks = [...document.querySelectorAll("#task")]
 
     if(e.altKey){
         e.preventDefault()
-        tasks[index].classList.add("hovering")
 
         if(count === 0){
+            tasks[index].classList.add("hovering")
             switch(e.key){
                 case "w":
                     if(!(tasks[0].classList.contains("hovering"))){
@@ -212,84 +202,55 @@ function keybinds(e){
             count = 1
             tasks[index].classList.remove("hovering")
             tasks[index].classList.add("dragging")
-            console.log("count = 1")
         }
 
         if(count === 1){
             switch(e.key){
                 case "w":
                     if(index > 0){
-                        let prevSibling = tasks[index - 1]
                         tasks = [...document.querySelectorAll("#task")]
+                        let prevSibling = tasks[index - 1]
                         box.insertBefore(tasks[index], prevSibling)
-                        //prevSibling.insertAdjacentElement('beforebegin', tasks[index]) //THIS WORKS!!!!
-                        console.log(tasks[index].getAttribute('item-id') + " " + prevSibling.getAttribute('item-id')) 
                         index--
 
                     }
                     break;
-                    //CAN'T GO DOWN???
                 case "s":
-                    if(index < tasks.length){
-                        let nextSibling = tasks[index + 1]
+                    if(index + 1 < tasks.length){
                         tasks = [...document.querySelectorAll("#task")]
-                        //nextSibling.insertAdjacentElement('beforebegin', tasks[index])
+                        let nextSibling = tasks[index + 2]
                         box.insertBefore(tasks[index], nextSibling)
-                        console.log(tasks[index].getAttribute('item-id') + " " + nextSibling.getAttribute('item-id'))
                         index++
                     }
                     break;
                 case "ArrowRight":
                     count = 2
-                    console.log("count = 2")
                     break;
             }
         }
-
-        if(count === 2) savePosition()
-            
+        if(count === 2) savePosition()   
     }
     else{
-        //remove dragging/hovering should happen without user needed to press again...display tasks remove there?
         tasks.forEach(task => {
             task.classList.remove("hovering")
             task.classList.remove("dragging")
         })
+        count = 0
+        displayTasks()
+        document.removeEventListener("keydown", moveTask)
     }
-    
-    //document.addEventListener("keydown")
 }
 
-//NOT WORKING
+
 function savePosition(){
-    //let i = 0
+
     let index = 0
     let tasksHtml = [...document.querySelectorAll("#task")]
     let tasksJson = JSON.parse(localStorage.getItem('tasks'))||[]
-   // console.log(tasksHtml)
-   // console.log(tasksJson)
 
     const updatedTasks = tasksJson.map(taskJson => {
-       // console.log("taskJson.item" + taskJson.item)
-       // console.log("taskHtml[index]" + index + ": " + tasksHtml[index].getAttribute('item-id'))
-
-        //tasksJson.forEach(task => {
-          //  let taskElement = document.querySelector(`#task[item-id='${task.item}']`);
-           // console.log(taskElement)
-
-
-            //task[i].getAttribute('item-id')
-            //if(String(task.item) === tasksHtml[i].getAttribute('item-id')){
-             //   console.log(String(task.item) + " : " + tasksHtml[i].getAttribute('item-id') + "   they can be compared")
-        // }
-       // })findTaskHtml(taskJson.item)
-
-
-
-        //loses value in this if statement
         if(String(taskJson.item) !== tasksHtml[index++].getAttribute('item-id')){ 
             let wanted = tasksJson.find(task => String(task.item) === tasksHtml[index - 1].getAttribute('item-id'))
-            console.log(wanted)
             taskJson = tasksJson.filter(task => String(task.item) === String(wanted.item)) 
 
             return {
@@ -301,26 +262,88 @@ function savePosition(){
                 item: index
             }
         }
-        else return taskJson //this works
+        else return taskJson
     })
     localStorage.setItem('tasks', JSON.stringify(updatedTasks))
     count = 0
     displayTasks()  
 }
 
-/*
-function findTaskHtml(itemId){
-    let tasksHtml = [...document.querySelectorAll("#task")]
-    let temp = tasksHtml.filter(task => task.getAttribute('item-id') === String(itemId))
+function openMenu(){}//load main page
 
-    //console.log("found: " + temp.getAttribute('item-id'))
-    return temp[0].getAttribute('item-id') 
+
+//make sure to block if any popup is open => same for others
+function settings(){
+    if(document.getElementById('settingsPopup') === null){
+        const settingsPopup = document.createElement("ul")
+        settingsPopup.setAttribute("id", "settingsPopup")
+        settingsPopup.innerHTML = `
+            <li id="theme" onclick="changeTheme()">Theme</li>
+            <li id="keybinds" onclick="keybinds()">Keybinds</li>
+            <li id="deleteAll" onclick="deleteAll()">Delete All</li>
+            <br>
+            <li id="closeSettings" onClick="closeSettings()">Close</li>
+        `;
+        document.body.appendChild(settingsPopup)
+    }
+}
+
+displayTasks()
+
+
+
+
+
+
+
+/*
+document.addEventListener('keydown', typingKeybindsAdd)
+function typingKeybindsEdit (e, taskId){
+    console.log("popp edit")
+    document.removeEventListener("keydown", moveTask)
+    if(e.altKey){
+        let keyBind = false
+        console.log("hello")
+        e.preventDefault()
+        switch (e.key){
+            case "1":
+                cancelEdit()
+                keybind = true
+                break;
+            case "2":
+                removeTask(taskId)
+                keyBind = true
+                break;
+            case "3":
+                saveTask()
+                keyBind = true
+                break;      
+        }
+
+        if(keyBind){
+            document.removeEventListener("keydown",typingKeybindsEdit)
+            document.addEventListener("keydown", moveTask)
+        }
+    }
+}
+
+function typingKeybindsAdd (e){
+    if(e.altKey){
+        e.preventDefault()
+        switch (e.key){
+            case "1":
+                cancelTask()
+                document.removeEventListener("keydown",typingKeybindsAdd)
+                break;
+            case "2":
+                saveTask()
+                document.removeEventListener("keydown",typingKeybindsAdd)
+                break;    
+        }
+    }
 }
 */
 
-function openMenu(){}
-
-displayTasks()
 
 
 
