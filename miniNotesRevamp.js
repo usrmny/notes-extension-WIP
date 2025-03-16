@@ -1,4 +1,5 @@
 const box = document.getElementById("list")
+let popup = false
 
 document.body.addEventListener('keydown', (e) => {
     if (e.altKey && 'ws'.indexOf(e.key) !== -1) {
@@ -8,7 +9,7 @@ document.body.addEventListener('keydown', (e) => {
   });
 
 function addTask(){
-    if(document.getElementById('taskPopup') === null && document.getElementById('editPopup') === null){
+    if(!popup){
         const taskPopup = document.createElement("div")
         taskPopup.setAttribute("id", "taskPopup")
         taskPopup.innerHTML = `
@@ -21,17 +22,20 @@ function addTask(){
             </div>
         `;
         document.body.appendChild(taskPopup)
+        popup = true
     }
 }
 
 function cancelTask(){
     const taskPopup = document.getElementById("taskPopup")
     if(taskPopup) taskPopup.remove()
+        popup = false
 }
 
 function cancelEdit(){
     const editPopup = document.getElementById("editPopup")
     if(editPopup) editPopup.remove()
+    popup = false
 }
 
 let item = 0
@@ -63,6 +67,7 @@ function saveTask(){
     
     taskPopup.remove()
     displayTasks()
+    popup = false
 }
 
 
@@ -120,10 +125,11 @@ function removeTask(taskId){
 
     document.getElementById("editPopup").remove()
     displayTasks()
+    popup = false
 }
 
 function editTask(taskId){
-    if(document.getElementById('taskPopup') === null && document.getElementById('editPopup') === null){
+    if(!popup){
         const tasks = JSON.parse(localStorage.getItem('tasks'))||[]
         const taskToEdit = tasks.find(task => task.id == taskId)
         const taskText = taskToEdit ? taskToEdit.text : ''
@@ -143,6 +149,7 @@ function editTask(taskId){
             </div>
         `;
         document.body.appendChild(editPopup)
+        popup = true
         //document.addEventListener('keydown', typingKeybindsEdit(taskId))
     }
 }
@@ -267,29 +274,121 @@ function savePosition(){
     localStorage.setItem('tasks', JSON.stringify(updatedTasks))
     count = 0
     displayTasks()  
+    popup = false
 }
-
-function openMenu(){}//load main page
-
 
 //make sure to block if any popup is open => same for others
 function settings(){
-    if(document.getElementById('settingsPopup') === null){
+    const deleteAllPopup = document.getElementById("deletePopup")
+    const keybindsPopup = document.getElementById("keybindsPopup")
+    const themePopup = document.getElementById("themePopup")
+
+    if(deleteAllPopup !== null) deleteAllPopup.remove()
+    else if(keybindsPopup !== null) keybindsPopup.remove()
+    else if(themePopup !== null) themePopup.remove()
+
+    if(!popup){
         const settingsPopup = document.createElement("ul")
         settingsPopup.setAttribute("id", "settingsPopup")
         settingsPopup.innerHTML = `
-            <li id="theme" onclick="changeTheme()">Theme</li>
+            <li id="theme" onclick="changeThemePopup()">Change Theme</li>
             <li id="keybinds" onclick="keybinds()">Keybinds</li>
-            <li id="deleteAll" onclick="deleteAll()">Delete All</li>
+            <li id="deleteAll" onclick="deletePopup()">Delete All</li>
             <br>
-            <li id="closeSettings" onClick="closeSettings()">Close</li>
+            <li id="closeSettings" onclick="closeSettings()">Close</li>
         `;
         document.body.appendChild(settingsPopup)
+        popup = true
     }
 }
 
-displayTasks()
+function changeThemePopup(){
+    const themePopup = document.createElement("div")
+    themePopup.setAttribute("id", "themePopup")
+    themePopup.innerHTML = `
+        <div id="themePopupBtns">
+            <button id="dayTheme" onclick="changeThemeJSON(this)">Day Theme</button>
+            <button id="nightTheme" onclick="changeThemeJSON(this)">Night Theme</button>
+        </div>
+        <button id="closeTheme" onClick="settings()">Go Back</button>
+    `;
+    document.body.appendChild(themePopup)
+    popup = true
+}
 
+function changeThemeJSON(e){
+    let pref = JSON.parse(localStorage.getItem('theme'))
+
+    if(e.id === "dayTheme") pref = {"theme":"day"}
+    else if(e.id ==="nightTheme") pref = {"theme":"night"}
+
+    localStorage.setItem('theme', JSON.stringify(pref))
+    changeTheme()
+}
+
+function changeTheme(){
+    let pref = JSON.parse(localStorage.getItem('theme'))
+    if(pref == null) {
+        pref = {"theme": "day"}
+        localStorage.setItem('theme', JSON.stringify(pref))
+    }
+    if(pref.theme == "day") document.body.setAttribute("class","light");
+    else if(pref.theme == "night") document.body.setAttribute("class","dark");
+}
+
+function keybinds(){
+    const keybindsPopup = document.createElement("div")
+    keybindsPopup.setAttribute("id", "keybindsPopup")
+    keybindsPopup.innerHTML = `
+        <ul>
+            <li>1. <i>Alt + w</i> and <i>Alt + s</i> to hover over the task you wish to move</li>
+            <li>2. <i>Alt + Enter</i> to select the task</li>
+            <li>3. <b>After <i>Alt + Enter</i> :</b> <i>Alt + w</i> and <i>Alt + s</i> to move the selected task</li>
+            <li>4. <b>After <i>Alt + Enter</i> :</b> <i>Alt + RightArrowKey</i> to insert the task in the new area.</li>
+            <li>Note: Letting go of <i>Alt</i> and pressing anything on your keyboard will cancel the process of moving a task.</li>
+        </ul>
+        <button id="closeKeybinds" onClick="settings()">Go Back</button>
+    `;
+    document.body.appendChild(keybindsPopup)
+    popup = true
+}
+
+
+function deletePopup(){
+    const deletePopup = document.createElement("div")
+    deletePopup.setAttribute("id", "deletePopup")
+    deletePopup.innerHTML = `
+            <h1>Are you sure?</h1>
+            <div id="deleteBtns">
+                <button id="cancelDeleteAll" onclick="settings()">Nevermind</button>
+                <button id="deleteAll" onclick="deleteAll()">Yes</button>
+            </div>
+        `;
+    document.body.appendChild(deletePopup)
+    popup = true
+}
+
+function deleteAll(){
+    localStorage.setItem('tasks', null)
+    document.getElementById("settingsPopup").remove()
+    document.getElementById("deletePopup").remove()
+    popup = false
+    displayTasks()
+}
+
+
+function closeSettings(){
+    const settingsPopup = document.getElementById("settingsPopup")
+    if(settingsPopup !== null) settingsPopup.remove()
+    popup = false
+}
+
+function openMenu(){
+    window.location.href = "miniNotesMenu.html"
+}
+
+changeTheme()
+displayTasks()
 
 
 
