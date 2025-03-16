@@ -1,13 +1,55 @@
-*   {
+* {
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
+}
+
+.light{
+    --primary-color: #eee;
+    --popup-bg:#eee;
+    --text-color: black;
+    --drag-text-color:black;
+    --border-color-popups: rgb(185, 185, 185);
+    --btn-border: black;
+    --drag-shadow: black;
+    --drag-bg: grey;
+    --settings-li-bg: rgb(221, 221, 221);
+    --settings-li-bg-hover: rgba(221, 221, 221, 0.795);
+    --settings-li-border: rgb(129, 129, 129);
+    --settings-btn-hover: #a09f9f54;
+    --button-bg: rgb(221, 221, 221);
+    --footer-delimiter: darkgrey;
+    --footer-bg: #eee;
+}
+
+
+/* needs tweeking */
+.dark{
+    --primary-color: #121212;
+    --popup-bg:#222222;
+    --text-color: rgb(235, 234, 234);
+    --drag-text-color:white;
+    --border-color-popups: rgb(94, 94, 94);
+    --btn-border: rgb(221, 215, 215);
+    --drag-shadow: rgb(209, 209, 209);
+    --drag-bg: rgb(228, 227, 227);
+    --settings-li-bg: rgb(105, 105, 105);
+    --settings-li-bg-hover: rgb(143, 143, 143, 0.795);
+    --settings-li-border: rgb(187, 187, 187);
+    --settings-btn-hover: #706f6fb6;
+    --button-bg: rgb(105, 105, 105);
+    --footer-delimiter: rgb(209, 209, 209);
+    --footer-bg: #121212;
+}
+
+body{
+    background-color: var(--primary-color)
 }
 
 #list{
     width:100%;
     height:0;
     display: table;
+    background: var(--primary-color);
 }
 
 .footer {
@@ -16,23 +58,36 @@
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+    border-top: 1px solid var(--footer-delimiter);
+    background: var(--footer-bg)
+}
+
+.footer i{
     cursor: pointer;
 }
 
-#taskPopup, #editPopup, #settingsPopup{
+#taskPopup, #editPopup, #settingsPopup, #deletePopup, #keybindsPopup, #themePopup{
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 500px;
     height: 350px;
+    padding: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    background: white;
-    border:2px solid rgb(185, 185, 185) ;
+    background: var(--popup-bg);
+    border:2px solid var(--border-color-popups);
 }
+
+
+/* overrides previous */
+#keybindsPopup{
+    height: 500px;
+}
+
 
 #taskPopup textarea, #editPopup textarea {
     width: 95%;
@@ -42,6 +97,8 @@
     font-family: 'Courier New', Courier, monospace;
     padding-left: 7px;
     padding-top: 10px;
+    background: var(--primary-color);
+    color: var(--text-color);
 }
 
 #createTask, #editTask {
@@ -59,7 +116,7 @@
 
 #taskPopupFooter, #editPopupFooter {
     margin: 20px 0 10px 0;
-    border-top: 2px solid grey;
+    border-top: 2px solid var(--footer-delimiter);
     width: 100%;
     height: 25%;
     display: flex;
@@ -79,7 +136,6 @@
     align-items: center;
     flex-grow: 1; 
     overflow: hidden; 
-    /*border: 2px solid black;*/
 }
 
 .checkbox {
@@ -87,6 +143,7 @@
     transform: scale(2);
     margin: 25px;
     cursor: pointer;
+    accent-color: var(--text-color);
 }
 
 #taskText {
@@ -105,8 +162,9 @@
     text-decoration: none;
     width: 70%;
     height: 15%;
-    border: 2px solid rgb(129, 129, 129);
-    background-color: rgb(221, 221, 221);
+    border: 2px solid var(--settings-li-border);
+    background-color: var(--settings-li-bg);
+    color: var(--text-color);
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 18px;
     display: flex;
@@ -114,35 +172,105 @@
     justify-content: center;
 }
 
-#settingsPopup li span{
-
-}
 
 #settingsPopup li:nth-of-type(2), #settingsPopup li:nth-of-type(3){
-    border: 2px solid rgb(129, 129, 129);
     border-top: 0;
 }
 
-#settingsPopup li:hover {
-    background-color: rgba(221, 221, 221, 0.795);
+#settingsPopup li:hover, #themePopup button:hover{
+    background-color: var(--settings-li-bg-hover);
     cursor: pointer;
 }
 
+#deletePopup h1{
+    font-weight: bold;
+}
+
+#deletePopup h1, #deleteBtns button, #keybindsPopup button, #themePopup button{
+    font-size: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#deleteBtns, #themePopupBtns{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 80%;
+    height: 50%;
+}
+
+#deleteBtns button, #keybindsPopup button, #themePopup button{
+    width: 150px;
+    height: 60px;
+    border: 2px solid var(--btn-border);
+    cursor: pointer;
+}
+
+#keybindsPopup button{
+    margin-bottom: 20px;
+}
+
+#closeKeybinds, #cancelDeleteAll, #themePopup button{
+    background: var(--button-bg);
+    color: var(--text-color);
+}
+
+#deletePopup h1, #deleteAll, #task p, i{
+    color: var(--text-color);
+}
+
+#deleteBtns:hover #cancelDeleteAll:hover, #keybindsPopup button:hover{
+    background-color: var(--settings-btn-hover);
+}
+
+#deleteBtns #deleteAll{
+    background: rgba(255, 0, 0, 0.822);
+}
+
+#deleteBtns #deleteAll:hover{
+    background: rgba(255, 0, 0, 0.479);
+}
+
+#keybindsPopup ul{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    height: 400px;
+    width: 100%;
+    margin-top: 20px;
+    list-style-type: none;
+    color: var(--text-color);
+}
+
+#keybindsPopup li{
+    width: 80%;
+    height: 55px;
+    font-size: 18px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    word-break: normal;
+    line-height: 23px;
+    margin: 5px;
+}
+
 .dragging {
-    border: 2px solid black;
-    box-shadow: 2px black;
-    opacity: 30%;
-    padding: 10px;
-    background: grey;
+    box-sizing: border-box;
+    border: 2px solid var(--btn-border);
+    box-shadow: 2px var(--drag-shadow);
+    opacity: 50%;
+    padding: 10px 0;
+    background: var(--drag-bg);
+}
+
+.dragging #taskText{
+    color: var(--primary-color);
 }
 
 .hovering{
-    opacity: 30%;
+    opacity: 50%;
 }
 
-
 .checked {
-    text-decoration-line: line-through;
+    text-decoration-line: line-through; 
     opacity: 50%;
 }
 
