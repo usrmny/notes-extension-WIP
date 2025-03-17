@@ -1,5 +1,4 @@
 const container = document.getElementById("container")
-//<i class="fa-solid fa-pen-to-square"></i>
 
 function newTab(){ //creates a popup to insert info
     const popupContainer = document.createElement("div")
@@ -31,21 +30,41 @@ function createNote(){ //creates the note with what was entered in the popup
             id: new Date().getTime(),
             text: noteTitle
         }
+        /*
+        let blob = new Blob([miniNotes.html], {type: "text/html"})
+        let link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = 'copy-' + index + '-notes.html'
+        link.click()
+        */
 
-    
+        const existingNotes = JSON.parse(localStorage.getItem('notes')) || []
+        existingNotes.push(title)
+        
+        localStorage.setItem('notes', JSON.stringify(existingNotes))
 
-    const existingNotes = JSON.parse(localStorage.getItem('notes')) || []
-    existingNotes.push(title)
-    
-    localStorage.setItem('notes', JSON.stringify(existingNotes))
-
-    document.getElementById('noteTitle').value = ''
+        document.getElementById('noteTitle').value = ''
     }
 
     popupContainer.remove()
     displayNotes();
 }
 
+/*
+let index = 0;
+function newFile(){
+    fetch('miniNotes.html')
+        .then(res => console.log(res))
+       // .then(htmlContent => {
+       //     const blob = new Blob([htmlContent], {type: 'text/html'})
+      //  })
+        //if(index == 0) let tabs = []
+        //const link = document.createElement('a')
+       // link.href = URL.createObjectURL(blob)
+        //link.download = 'copy-' + index + '-notes.html'
+       // link.click()
+}
+*/
 function displayNotes(){
     const notesList = document.getElementById('notes-list')
     notesList.innerHTML = ''
@@ -127,9 +146,8 @@ function deleteNote(noteId){
     displayNotes()
 }
 
-//OVEr HReR
 function openNotes(){
-    window.location.href = ''
+    
 }
 
 displayNotes()
