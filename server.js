@@ -1,23 +1,46 @@
-const http = require('http')
-const fs = require('fs')
+const express = require('express')
+const app = express()
 const path = require('path')
-const port = 3000
 
-const server = http.createServer(function(req, res) {
-    res.writeHead(200, { 'Content-Type': 'text/html'})
-    fs.readFile('miniNotes.html', function(error ,data) {
-        if(error) {
-            res.writeHead(404, { 'Content-Type': 'text/html'})
-            res.write('<h1>Error: File Not Found</h1>')
-        }
-        else {
-            res.write(data)
-        }
-        res.end()
-    })
+const dirPath = path.join(__dirname, "public")
+
+app.get("/", (req,res) => {
+    res.end();
 })
 
-server.listen(port, function(error) {
-    if(error) console.log('An error occured: ' + error)
-    else console.log('Server is listening on port ' + port)
-})
+app.use(express.static(dirPath))//to use static files in dirPath
+
+
+app.listen(3000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//app.set("view engine", "ejs")
+
+//app.get('/', (req, res) => {
+   // console.log("hello")
+    //res.download("Downloads!!!")
+    //console.log("hello")
+    //res.status(500).json({message:"Error"})
+   // res.render('miniNotes')
+//})
+
+
+//const userRouter = require('./routes/users')
+
+// creaes routes for all files 
+// that end with /users in 
+// directory and applies whats in 
+// users.js
+//app.use('/users', userRouter)
