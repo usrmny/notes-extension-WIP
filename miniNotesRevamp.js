@@ -88,6 +88,23 @@ function displayTasks(){
             <p id="taskText" class="unchecked" onclick="editTask(${task.id})" placeholder="Add a task...">${task.text} </p>
             `;
 
+        if(task.note !== "") {
+            const note = document.createElement("p")
+            note.innerHTML=`${task.note}`
+            note.setAttribute("id", "taskNote")
+            note.setAttribute("class", "unchecked")
+            listItem.appendChild(note)
+        }
+
+        if(task.note !== "") {
+            const subTask = document.createElement("p")
+            note.innerHTML=`${task.subTask}`
+            note.setAttribute("id", "taskSubTask")
+            note.setAttribute("class", "unchecked")
+            listItem.appendChild(subTask)
+        }
+
+
         const text = listItem.querySelector('p')
         if(task.checked) text.setAttribute("class", "checked")
         else text.setAttribute("class", "unchecked")
