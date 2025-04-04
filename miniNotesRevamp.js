@@ -96,11 +96,11 @@ function displayTasks(){
             listItem.appendChild(note)
         }
 
-        if(task.note !== "") {
+        if(task.subTask !== "") {
             const subTask = document.createElement("p")
-            note.innerHTML=`${task.subTask}`
-            note.setAttribute("id", "taskSubTask")
-            note.setAttribute("class", "unchecked")
+            subTask.innerHTML=`${task.subTask}`
+            subTask.setAttribute("id", "taskSubTask")
+            subTask.setAttribute("class", "unchecked")
             listItem.appendChild(subTask)
         }
 
