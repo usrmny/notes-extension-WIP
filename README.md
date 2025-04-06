@@ -1,1 +1,4 @@
-This a sandbox to continue the js part while I figureout the Node.js for this project
+Project is still a work in progress. If you are still interested in trying it regardless, you can just download these files:
+- miniNotes.html
+- styles.css
+- miniNotesRevamp.js
