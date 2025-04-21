@@ -52,6 +52,7 @@ function saveTask(){
             note: taskNote,
             subText: taskSubText,
             checked: false,
+            showExtra: false,
             item: item++
         } 
     
@@ -85,25 +86,39 @@ function displayTasks(){
         //listItem.setAttribute("draggable", true)
         listItem.innerHTML = `
             <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
-            <p id="taskText" class="unchecked" onclick="editTask(${task.id})" placeholder="Add a task...">${task.text} </p>
+            <div class="alignVertical" onclick="editTask(${task.id})">
+                <p id="taskText" class="unchecked" placeholder="Add a task...">${task.text} </p>
+            </div>
+            <i class="fa-solid fa-caret-down" onclick="showSubTasks(${task.id})"></i>
             `;
 
-        if(task.note !== "") {
-            const note = document.createElement("p")
-            note.innerHTML=`${task.note}`
-            note.setAttribute("id", "taskNote")
-            note.setAttribute("class", "unchecked")
-            listItem.appendChild(note)
-        }
 
-        if(task.subTask !== "") {
-            const subTask = document.createElement("p")
-            subTask.innerHTML=`${task.subTask}`
-            subTask.setAttribute("id", "taskSubTask")
-            subTask.setAttribute("class", "unchecked")
-            listItem.appendChild(subTask)
+        if(task.showExtra){
+            const div = listItem.querySelector('div');
+            let isChecked = task.checked
+            if(task.note !== "") {
+                const note = document.createElement("p")
+                note.innerHTML=`${task.note}`
+                note.setAttribute("id", "taskNote")
+                switch (isChecked){
+                    case true: note.setAttribute("class", "checked")
+                                break;
+                    default: note.setAttribute("class", "unchecked")
+                }
+                div.insertAdjacentElement("BeforeEnd", note)
+            }
+            if(task.subText !== "") {
+                const subTask = document.createElement("p")
+                subTask.innerHTML=`${task.subText}`
+                subTask.setAttribute("id", "subTask")
+                switch (isChecked){
+                    case true: subTask.setAttribute("class", "checked")
+                                break;
+                    default: subTask.setAttribute("class", "unchecked")
+                }
+                div.insertAdjacentElement("BeforeEnd", subTask)
+            }
         }
-
 
         const text = listItem.querySelector('p')
         if(task.checked) text.setAttribute("class", "checked")
@@ -111,6 +126,30 @@ function displayTasks(){
 
         taskList.appendChild(listItem)
     })
+    popup = false;
+}
+
+function showSubTasks(taskId){
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || []
+    const taskExpended = tasks.find(task => task.id == taskId)
+
+        let updatedChecks = tasks.map(task => {
+            if(task.id == taskId){
+                return{
+                    id: task.id, 
+                    text: task.text,
+                    note: task.note,
+                    subText: task.subText,
+                    checked: task.checked, 
+                    showExtra: !taskExpended.showExtra,
+                    item: task.item
+                }
+            }
+            else return task
+        })
+
+    localStorage.setItem('tasks', JSON.stringify(updatedChecks))
+    displayTasks()
 }
 
 function boxClicked(taskId){
@@ -125,6 +164,7 @@ function boxClicked(taskId){
                     note: task.note,
                     subText: task.subText,
                     checked: !taskChecked.checked, 
+                    showExtra: false,
                     item: task.item
                 }
             }
@@ -140,6 +180,27 @@ function removeTask(taskId){
     tasks = tasks.filter(task => task.id !== taskId)
     localStorage.setItem('tasks', JSON.stringify(tasks))
 
+    document.getElementById("editPopup").remove()
+    displayTasks()
+    popup = false
+}
+
+function copyTask(taskId){
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || []
+    const taskToCopy = tasks.find(task => task.id == taskId)
+
+    const task = {
+        id: new Date().getTime(),
+        text: taskToCopy.text,
+        note: taskToCopy.note,
+        subText: taskToCopy.subText,
+        checked: taskToCopy.checked,
+        showExtra: taskToCopy.showExtra,
+        item: item++
+    } 
+
+    tasks.push(task)
+    localStorage.setItem('tasks', JSON.stringify(tasks))
     document.getElementById("editPopup").remove()
     displayTasks()
     popup = false
@@ -162,6 +223,7 @@ function editTask(taskId){
             <div id="editPopupFooter">
                 <i class="fa-solid fa-arrow-left" onclick="cancelEdit()"></i>
                 <i class="fa-solid fa-trash-can" onclick="removeTask(${taskId})"></i>
+                <i class="fa-solid fa-clone" onclick="copyTask(${taskId})"></i>
                 <i class="fa-solid fa-square-check" onclick="updateTask(${taskId})"></i>
             </div>
         `;
@@ -183,6 +245,7 @@ function updateTask(taskId){
                 note: document.getElementById("editTaskNote").value,
                 subText: document.getElementById("editTaskSub").value,
                 checked: task.checked,
+                showExtra: task.showExtra,
                 item: task.item
             }
         }
@@ -271,20 +334,42 @@ function savePosition(){
     let index = 0
     let tasksHtml = [...document.querySelectorAll("#task")]
     let tasksJson = JSON.parse(localStorage.getItem('tasks'))||[]
+    //instead of filtering and replacing if not the same, couldn't we just replace the entire thing??? then just remove item? NVM, json != html
+
+    //copying causes issues with this TOFIX NOW OVER HERE... winner? DONT FORGET TO FIX COLOURS
+    //nvm copying => breaks when move up or down just once sometimes??? 
+    //breaks when enter on itself???
+
+    //USE DEBUGGER => error with wanted variable
 
     const updatedTasks = tasksJson.map(taskJson => {
-        if(String(taskJson.item) !== tasksHtml[index++].getAttribute('item-id')){ 
-            let wanted = tasksJson.find(task => String(task.item) === tasksHtml[index - 1].getAttribute('item-id'))
+        if(String(taskJson.item) !== tasksHtml[index].getAttribute('item-id')){ 
+            let wanted = tasksJson.find(task => String(task.item) === tasksHtml[index].getAttribute('item-id'))
             taskJson = tasksJson.filter(task => String(task.item) === String(wanted.item)) 
+            console.log({wanted})
+            console.log(taskJson[0])
+            index++
 
+            return {
+                id: wanted.id, 
+                text: wanted.text, 
+                note: wanted.note,
+                subText: wanted.subText,
+                checked: wanted.checked,
+                showExtra: wanted.showExtra,
+                item: index - 1
+            }
+            /*
             return {
                 id: taskJson[0].id, 
                 text: taskJson[0].text, 
                 note: taskJson[0].note,
                 subText: taskJson[0].subText,
                 checked: taskJson[0].checked,
+                showExtra: taskJson[0].showExtra,
                 item: index
             }
+                */
         }
         else return taskJson
     })
@@ -390,6 +475,7 @@ function deleteAll(){
     document.getElementById("settingsPopup").remove()
     document.getElementById("deletePopup").remove()
     popup = false
+    item = 0;
     displayTasks()
 }
 
@@ -400,9 +486,11 @@ function closeSettings(){
     popup = false
 }
 
+/*
 function openMenu(){
     window.location.href = "miniNotesMenu.html"
 }
+    */
 
 changeTheme()
 displayTasks()
