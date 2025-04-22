@@ -86,11 +86,14 @@ function displayTasks(){
         //listItem.setAttribute("draggable", true)
         listItem.innerHTML = `
             <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
-            <div class="alignVertical" onclick="editTask(${task.id})">
+            <div class="alignVertical">
                 <p id="taskText" class="unchecked" placeholder="Add a task...">${task.text} </p>
             </div>
             <i class="fa-solid fa-caret-down" onclick="showSubTasks(${task.id})"></i>
             `;
+        listItem.querySelector("div").addEventListener("click", () => editTask(task.id)) //must do () => so its not called immediately!
+        //so it can be removed with bulkDelete()
+        //innerHTML causes events to not be added in a list to track all events. => can't remove (imagine as embedded to the element)
 
 
         if(task.showExtra){
@@ -268,6 +271,8 @@ function moveTask(e){
         e.preventDefault()
 
         if(count === 0){
+            //Error can ooccur here => when this occurs, other error usually follows =>
+                //solve other means this gets fixed?
             tasks[index].classList.add("hovering")
             switch(e.key){
                 case "w":
@@ -331,24 +336,23 @@ function moveTask(e){
 
 function savePosition(){
 
-    let index = 0
+    let index = 0 //local !== global
     let tasksHtml = [...document.querySelectorAll("#task")]
     let tasksJson = JSON.parse(localStorage.getItem('tasks'))||[]
     //instead of filtering and replacing if not the same, couldn't we just replace the entire thing??? then just remove item? NVM, json != html
 
     //copying causes issues with this TOFIX NOW OVER HERE... winner? DONT FORGET TO FIX COLOURS
     //nvm copying => breaks when move up or down just once sometimes??? 
-    //breaks when enter on itself???
-
-    //USE DEBUGGER => error with wanted variable
+    //sometimes breaks, don't know why (wrong task gets copied over after moving)
 
     const updatedTasks = tasksJson.map(taskJson => {
-        if(String(taskJson.item) !== tasksHtml[index].getAttribute('item-id')){ 
-            let wanted = tasksJson.find(task => String(task.item) === tasksHtml[index].getAttribute('item-id'))
-            taskJson = tasksJson.filter(task => String(task.item) === String(wanted.item)) 
-            console.log({wanted})
-            console.log(taskJson[0])
-            index++
+        if(String(taskJson.item) !== tasksHtml[index++].getAttribute('item-id')){ //index++ must be there (else wont always trigger)
+            console.log(String(taskJson.item) + " !== " + tasksHtml[index - 1].getAttribute('item-id'))
+            let wanted = tasksJson.find(task => String(task.item) === tasksHtml[index - 1].getAttribute('item-id'))
+            //taskJson = tasksJson.filter(task => String(task.item) === String(wanted.item)) 
+            console.log(wanted.text)
+            console.log("index = " + index)
+            console.log(index)
 
             return {
                 id: wanted.id, 
@@ -357,7 +361,7 @@ function savePosition(){
                 subText: wanted.subText,
                 checked: wanted.checked,
                 showExtra: wanted.showExtra,
-                item: index - 1
+                item: index
             }
             /*
             return {
@@ -378,6 +382,60 @@ function savePosition(){
     displayTasks()  
     popup = false
 }
+
+function bulkDelete(){
+    let allPara = document.querySelectorAll("#list > li")
+
+    allPara.forEach(para => {
+        let paraDiv = para.querySelector("div")
+        console.log("hello")
+        console.log("events: " + paraDiv.classList)
+        paraDiv.removeEventListener("click", editTask)
+        para.addEventListener("click", bulkDeleteSelected) //bulkDeleteSelected() => '()' calls it immediately
+    })
+    
+
+    const footer = document.getElementById("footer")
+    footer.innerHTML=`
+    <i class="fa-solid fa-xmark" onclick="cancelBulk()"></i>
+    <i class="fa-solid fa-check" onclick="submitBulk()"></i>
+    `
+}
+
+function bulkDeleteSelected(){
+    let elementClicked = this
+    //ensure no other function occurs until cancelBulk() is called!!!
+    //fix when click p (and only p (not div)) editTask popup occurs
+    if(elementClicked.classList.contains("bulkSelected")) 
+        elementClicked.classList.remove("bulkSelected")
+    else elementClicked.classList.add("bulkSelected")
+}
+
+function cancelBulk(){
+    let allPara = document.querySelectorAll("#list > li")
+    allPara.forEach(para => { 
+        para.removeEventListener("click", bulkDeleteSelected)
+
+        if(para.classList.contains("bulkSelected")) 
+            para.classList.remove("bulkSelected")
+    })
+
+    const footer = document.getElementById("footer")
+    footer.innerHTML=`
+    <i class="fa-solid fa-gear" onclick="settings()"></i>
+    <i class="fa-solid fa-plus" onclick="addTask()"></i>
+    <i class="fa-solid fa-trash-can-arrow-up" onclick="bulkDelete()"></i>
+    `
+    
+    displayTasks() //reinstates the edit event
+}
+function submitBulk(){
+
+    //compare with JSON to actually remove
+
+    cancelBulk()
+}
+//cancel button and enter button => revert eventlisiners
 
 //make sure to block if any popup is open => same for others
 function settings(){
