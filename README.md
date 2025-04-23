@@ -1,14 +1,24 @@
-I will create folders for my files once I finish what's left to do. (This will also become an actual guide on how to the project).
+Current Functionalities:
+- Add, edit and delete Items
+- Move items around. (click {gear icon > keybinds} to see how)
+- Checking items when done
+- day/night theme
+- Delete All button
+- Duplicate item button
 
-The only part ready to be seen is the actual notes page (not the menu page). If you're interested in checking that out, you must download these files and keep them in the same folder:
+Working On / TODO: 
+- Bulk Delete
+- Change Fonts
+- Way to section off items
+- Ability to add multiple sub items
+- use the notion api to read deadlines from notion and inscribe them in notes on request by user
+
+I will create folders for my files once I finish what's left to do.
+
+If you're interested in trying this project out, download the following files:
 
 - miniNotes.html
 - styles.css
 - miniNotesRevamp.js
-  
-TODO:
-- each note must connect to a new miniNotes.html page (node.js)
-- use the notion api to read deadlines from notion and inscribe them in notes on request by user
-- additional subtask for each subtask created (optional)
-- more keybinds??? (maybe/ not sure if its needed)
-+ All the requests so far
+
+NOTE: All the files in the "archive" folder can be ignored.
