@@ -1,4 +1,4 @@
-If you're interested in trying this project out, download the following files:
+If you're interested in trying this project out, download the following files and place them in the same folder:
 - miniNotes.html
 - styles.css
 - miniNotesRevamp.js
