@@ -3,7 +3,7 @@ If you're interested in trying this project out, download the following files an
 - styles.css
 - miniNotesRevamp.js
 
-NOTE: All the files in the "archive" folder can be ignored.
+NOTE: All the files in the "Archive" folder can be ignored.
 
 Current Functionalities:
 - Add, edit and delete Items
