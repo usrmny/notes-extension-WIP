@@ -23,3 +23,4 @@ Working On / TODO:
 
 Current Know Bugs: 
 - Can move tasks when trying to bulkDelete
+- checking a task hides its note + subTasks if they're visible
