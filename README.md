@@ -12,11 +12,14 @@ Current Functionalities:
 - day/night theme
 - Delete All button
 - Duplicate item button
+- Bulk Delete
 
 Working On / TODO: 
-- Bulk Delete
 - Change Fonts
 - Way to section off items
 - Ability to add multiple sub items
 - use the notion api to read deadlines from notion and inscribe them in notes on request by user
+- update icons / night theme
 
+Current Know Bugs: 
+- Can move tasks when trying to bulkDelete
