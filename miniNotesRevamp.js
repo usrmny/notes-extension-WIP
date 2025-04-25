@@ -1,12 +1,18 @@
+//item resets when page refreshes => causes data to disappear
+
+
 const box = document.getElementById("list")
 let popup = false
 
-document.body.addEventListener('keydown', (e) => {
-    if (e.altKey && 'ws'.indexOf(e.key) !== -1) {
-      e.preventDefault();
-    }
-    if(e.altKey)document.addEventListener("keydown", moveTask)
-  });
+let preventEvent = false
+if(!preventEvent){
+    document.body.addEventListener('keydown', (e) => {
+        if (e.altKey && 'ws'.indexOf(e.key) !== -1) {
+        e.preventDefault();
+        }
+        if(e.altKey)document.addEventListener("keydown", moveTask)
+    });
+}
 
 function addTask(){
     if(!popup){
@@ -38,8 +44,13 @@ function cancelEdit(){
     popup = false
 }
 
-let item = 0
+
 function saveTask(){
+    
+    const existingTasks = JSON.parse(localStorage.getItem('tasks')) || []
+    let item = existingTasks.length
+
+
     const taskPopup = document.getElementById("taskPopup")
     const taskText = document.getElementById("createTask").value.trim()
     const taskNote = document.getElementById("createTaskNote").value.trim()
@@ -53,11 +64,10 @@ function saveTask(){
             subText: taskSubText,
             checked: false,
             showExtra: false,
-            item: item++
+            item: item
         } 
     
 
-        const existingTasks = JSON.parse(localStorage.getItem('tasks')) || []
         existingTasks.push(task)
 
         localStorage.setItem('tasks', JSON.stringify(existingTasks))
@@ -79,56 +89,58 @@ function displayTasks(){
     taskList.innerHTML = ''
 
     const tasks = JSON.parse(localStorage.getItem('tasks')) || []
-    tasks.forEach(task => {
-        const listItem = document.createElement("li") 
-        listItem.setAttribute("id", "task")
-        listItem.setAttribute("item-id", task.item)
-        //listItem.setAttribute("draggable", true)
-        listItem.innerHTML = `
-            <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
-            <div class="alignVertical">
-                <p id="taskText" class="unchecked" placeholder="Add a task...">${task.text} </p>
-            </div>
-            <i class="fa-solid fa-caret-down" onclick="showSubTasks(${task.id})"></i>
-            `;
-        listItem.querySelector("div").addEventListener("click", () => editTask(task.id)) //must do () => so its not called immediately!
-        //so it can be removed with bulkDelete()
-        //innerHTML causes events to not be added in a list to track all events. => can't remove (imagine as embedded to the element)
+    if(tasks.length > 0){
+        tasks.forEach(task => {
+            const listItem = document.createElement("li") 
+            listItem.setAttribute("id", "task")
+            listItem.setAttribute("item-id", task.item)
+            //listItem.setAttribute("draggable", true)
+            listItem.innerHTML = `
+                <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
+                <div class="alignVertical">
+                    <p id="taskText" class="unchecked" placeholder="Add a task...">${task.text} </p>
+                </div>
+                <i class="fa-solid fa-caret-down" onclick="showSubTasks(${task.id})"></i>
+                `;
+            listItem.querySelector("div").addEventListener("click", () => editTask(task.id)) //must do () => so its not called immediately!
+            //so it can be removed with bulkDelete()
+            //innerHTML causes events to not be added in a list to track all events. => can't remove (imagine as embedded to the element)
 
 
-        if(task.showExtra){
-            const div = listItem.querySelector('div');
-            let isChecked = task.checked
-            if(task.note !== "") {
-                const note = document.createElement("p")
-                note.innerHTML=`${task.note}`
-                note.setAttribute("id", "taskNote")
-                switch (isChecked){
-                    case true: note.setAttribute("class", "checked")
-                                break;
-                    default: note.setAttribute("class", "unchecked")
+            if(task.showExtra){
+                const div = listItem.querySelector('div');
+                let isChecked = task.checked
+                if(task.note !== "") {
+                    const note = document.createElement("p")
+                    note.innerHTML=`${task.note}`
+                    note.setAttribute("id", "taskNote")
+                    switch (isChecked){
+                        case true: note.setAttribute("class", "checked")
+                                    break;
+                        default: note.setAttribute("class", "unchecked")
+                    }
+                    div.insertAdjacentElement("BeforeEnd", note)
                 }
-                div.insertAdjacentElement("BeforeEnd", note)
-            }
-            if(task.subText !== "") {
-                const subTask = document.createElement("p")
-                subTask.innerHTML=`${task.subText}`
-                subTask.setAttribute("id", "subTask")
-                switch (isChecked){
-                    case true: subTask.setAttribute("class", "checked")
-                                break;
-                    default: subTask.setAttribute("class", "unchecked")
+                if(task.subText !== "") {
+                    const subTask = document.createElement("p")
+                    subTask.innerHTML=`${task.subText}`
+                    subTask.setAttribute("id", "subTask")
+                    switch (isChecked){
+                        case true: subTask.setAttribute("class", "checked")
+                                    break;
+                        default: subTask.setAttribute("class", "unchecked")
+                    }
+                    div.insertAdjacentElement("BeforeEnd", subTask)
                 }
-                div.insertAdjacentElement("BeforeEnd", subTask)
             }
-        }
 
-        const text = listItem.querySelector('p')
-        if(task.checked) text.setAttribute("class", "checked")
-        else text.setAttribute("class", "unchecked")
+            const text = listItem.querySelector('p')
+            if(task.checked) text.setAttribute("class", "checked")
+            else text.setAttribute("class", "unchecked")
 
-        taskList.appendChild(listItem)
-    })
+            taskList.appendChild(listItem)
+        })
+    }
     popup = false;
 }
 
@@ -190,6 +202,7 @@ function removeTask(taskId){
 
 function copyTask(taskId){
     let tasks = JSON.parse(localStorage.getItem('tasks')) || []
+    let item = tasks.length
     const taskToCopy = tasks.find(task => task.id == taskId)
 
     const task = {
@@ -199,7 +212,7 @@ function copyTask(taskId){
         subText: taskToCopy.subText,
         checked: taskToCopy.checked,
         showExtra: taskToCopy.showExtra,
-        item: item++
+        item: item
     } 
 
     tasks.push(task)
@@ -261,6 +274,7 @@ function updateTask(taskId){
     displayTasks()
 }
 
+//both only used for moveTask()
 let count = 0
 let index = 0
 
@@ -346,13 +360,9 @@ function savePosition(){
     //sometimes breaks, don't know why (wrong task gets copied over after moving)
 
     const updatedTasks = tasksJson.map(taskJson => {
-        if(String(taskJson.item) !== tasksHtml[index++].getAttribute('item-id')){ //index++ must be there (else wont always trigger)
-            console.log(String(taskJson.item) + " !== " + tasksHtml[index - 1].getAttribute('item-id'))
+        index++ // must be there (else wont always trigger)
+        if(String(taskJson.item) !== tasksHtml[index - 1].getAttribute('item-id')){ 
             let wanted = tasksJson.find(task => String(task.item) === tasksHtml[index - 1].getAttribute('item-id'))
-            //taskJson = tasksJson.filter(task => String(task.item) === String(wanted.item)) 
-            console.log(wanted.text)
-            console.log("index = " + index)
-            console.log(index)
 
             return {
                 id: wanted.id, 
@@ -361,19 +371,8 @@ function savePosition(){
                 subText: wanted.subText,
                 checked: wanted.checked,
                 showExtra: wanted.showExtra,
-                item: index
+                item: index - 1 
             }
-            /*
-            return {
-                id: taskJson[0].id, 
-                text: taskJson[0].text, 
-                note: taskJson[0].note,
-                subText: taskJson[0].subText,
-                checked: taskJson[0].checked,
-                showExtra: taskJson[0].showExtra,
-                item: index
-            }
-                */
         }
         else return taskJson
     })
@@ -384,16 +383,17 @@ function savePosition(){
 }
 
 function bulkDelete(){
+    popup = true //temp solution, since removing eventListener not working.
+    preventEvent = true
     let allPara = document.querySelectorAll("#list > li")
 
     allPara.forEach(para => {
         let paraDiv = para.querySelector("div")
-        console.log("hello")
-        console.log("events: " + paraDiv.classList)
         paraDiv.removeEventListener("click", editTask)
         para.addEventListener("click", bulkDeleteSelected) //bulkDeleteSelected() => '()' calls it immediately
     })
-    
+
+    document.removeEventListener("keydown", moveTask)
 
     const footer = document.getElementById("footer")
     footer.innerHTML=`
@@ -411,6 +411,32 @@ function bulkDeleteSelected(){
     else elementClicked.classList.add("bulkSelected")
 }
 
+function submitBulk(){
+
+    let index = 0 //local !== global
+    let tasksHtml = [...document.querySelectorAll("#task")]
+    let tasksJson = JSON.parse(localStorage.getItem('tasks'))||[]
+
+    const updatedTasks = tasksJson.map(taskJson => {
+        if(!tasksHtml[index++].classList.contains("bulkSelected")){
+            return {
+                id: taskJson.id, 
+                text: taskJson.text, 
+                note: taskJson.note,
+                subText: taskJson.subText,
+                checked: taskJson.checked,
+                showExtra: taskJson.showExtra,
+                item: index - 1 
+            }
+        }
+    })
+    const tasksFiltered = updatedTasks.filter(task => task != null)
+
+    localStorage.setItem('tasks', JSON.stringify(tasksFiltered))
+
+    cancelBulk()
+}
+
 function cancelBulk(){
     let allPara = document.querySelectorAll("#list > li")
     allPara.forEach(para => { 
@@ -420,22 +446,23 @@ function cancelBulk(){
             para.classList.remove("bulkSelected")
     })
 
+    document.body.addEventListener('keydown', (e) => {
+        if (e.altKey && 'ws'.indexOf(e.key) !== -1) {
+          e.preventDefault();
+        }
+        if(e.altKey)document.addEventListener("keydown", moveTask)
+      });
+
     const footer = document.getElementById("footer")
     footer.innerHTML=`
     <i class="fa-solid fa-gear" onclick="settings()"></i>
     <i class="fa-solid fa-plus" onclick="addTask()"></i>
     <i class="fa-solid fa-trash-can-arrow-up" onclick="bulkDelete()"></i>
     `
-    
+    popup = false //temp solution
     displayTasks() //reinstates the edit event
 }
-function submitBulk(){
-
-    //compare with JSON to actually remove
-
-    cancelBulk()
-}
-//cancel button and enter button => revert eventlisiners
+//cancel button and enter button => revert eventlisteners
 
 //make sure to block if any popup is open => same for others
 function settings(){
@@ -544,11 +571,6 @@ function closeSettings(){
     popup = false
 }
 
-/*
-function openMenu(){
-    window.location.href = "miniNotesMenu.html"
-}
-    */
 
 changeTheme()
 displayTasks()
