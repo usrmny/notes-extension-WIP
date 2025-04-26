@@ -14,13 +14,12 @@ Current Functionalities:
 - Duplicate item button
 - Bulk Delete
 
-Working On / TODO: 
-- Change Fonts
+Working On: 
+- Ability to change fonts
 - Way to section off items
 - Ability to add multiple sub items
-- use the notion api to read deadlines from notion and inscribe them in notes on request by user
-- update icons / night theme
+- Connect the notion api to read deadlines from notion and inscribe them in notes on request by user
+- Update icons
 
-Current Know Bugs: 
-- Can move tasks when trying to bulkDelete
-- checking a task hides its note + subTasks if they're visible
+Current Known Bugs: 
+- All fixed for now.
