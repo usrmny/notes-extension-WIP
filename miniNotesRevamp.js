@@ -5,14 +5,12 @@ const box = document.getElementById("list")
 let popup = false
 
 let preventEvent = false
-if(!preventEvent){
-    document.body.addEventListener('keydown', (e) => {
-        if (e.altKey && 'ws'.indexOf(e.key) !== -1) {
+document.body.addEventListener('keydown', (e) => {
+    if (e.altKey && 'ws'.indexOf(e.key) !== -1) {
         e.preventDefault();
-        }
-        if(e.altKey)document.addEventListener("keydown", moveTask)
-    });
-}
+    }
+    if(!preventEvent && e.altKey)document.addEventListener("keydown", moveTask)
+});
 
 function addTask(){
     if(!popup){
@@ -86,7 +84,7 @@ function saveTask(){
 function displayTasks(){
 
     const taskList = document.getElementById('list')
-    taskList.innerHTML = ''
+    taskList.innerHTML = '' //remove for displaySections
 
     const tasks = JSON.parse(localStorage.getItem('tasks')) || []
     if(tasks.length > 0){
@@ -144,6 +142,68 @@ function displayTasks(){
     popup = false;
 }
 
+/*
+function displaySections(){
+    const taskList = document.getElementById('list')
+    taskList.innerHTML = ''
+
+    const sections = JSON.parse(localStorage.getItem('sections')) || []
+    if(sections.length > 0){
+        tasks.forEach(task => {
+            const listItem = document.createElement("li") 
+            listItem.setAttribute("id", "task")
+            listItem.setAttribute("item-id", task.item)
+            //listItem.setAttribute("draggable", true)
+            listItem.innerHTML = `
+                <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
+                <div class="alignVertical">
+                    <p id="taskText" class="unchecked" placeholder="Add a task...">${task.text} </p>
+                </div>
+                <i class="fa-solid fa-caret-down" onclick="showSubTasks(${task.id})"></i>
+                `;
+            listItem.querySelector("div").addEventListener("click", () => editTask(task.id)) //must do () => so its not called immediately!
+            //so it can be removed with bulkDelete()
+            //innerHTML causes events to not be added in a list to track all events. => can't remove (imagine as embedded to the element)
+
+
+            if(task.showExtra){
+                const div = listItem.querySelector('div');
+                let isChecked = task.checked
+                if(task.note !== "") {
+                    const note = document.createElement("p")
+                    note.innerHTML=`${task.note}`
+                    note.setAttribute("id", "taskNote")
+                    switch (isChecked){
+                        case true: note.setAttribute("class", "checked")
+                                    break;
+                        default: note.setAttribute("class", "unchecked")
+                    }
+                    div.insertAdjacentElement("BeforeEnd", note)
+                }
+                if(task.subText !== "") {
+                    const subTask = document.createElement("p")
+                    subTask.innerHTML=`${task.subText}`
+                    subTask.setAttribute("id", "subTask")
+                    switch (isChecked){
+                        case true: subTask.setAttribute("class", "checked")
+                                    break;
+                        default: subTask.setAttribute("class", "unchecked")
+                    }
+                    div.insertAdjacentElement("BeforeEnd", subTask)
+                }
+            }
+
+            const text = listItem.querySelector('p')
+            if(task.checked) text.setAttribute("class", "checked")
+            else text.setAttribute("class", "unchecked")
+
+            taskList.appendChild(listItem)
+        })
+    }
+    else displayTasks()
+}
+*/
+
 function showSubTasks(taskId){
     let tasks = JSON.parse(localStorage.getItem('tasks')) || []
     const taskExpended = tasks.find(task => task.id == taskId)
@@ -179,7 +239,7 @@ function boxClicked(taskId){
                     note: task.note,
                     subText: task.subText,
                     checked: !taskChecked.checked, 
-                    showExtra: false,
+                    showExtra: task.showExtra,
                     item: task.item
                 }
             }
@@ -353,11 +413,6 @@ function savePosition(){
     let index = 0 //local !== global
     let tasksHtml = [...document.querySelectorAll("#task")]
     let tasksJson = JSON.parse(localStorage.getItem('tasks'))||[]
-    //instead of filtering and replacing if not the same, couldn't we just replace the entire thing??? then just remove item? NVM, json != html
-
-    //copying causes issues with this TOFIX NOW OVER HERE... winner? DONT FORGET TO FIX COLOURS
-    //nvm copying => breaks when move up or down just once sometimes??? 
-    //sometimes breaks, don't know why (wrong task gets copied over after moving)
 
     const updatedTasks = tasksJson.map(taskJson => {
         index++ // must be there (else wont always trigger)
@@ -381,6 +436,57 @@ function savePosition(){
     displayTasks()  
     popup = false
 }
+
+/*
+function addSection(){
+    if(!popup){
+        const sectionPopup = document.createElement("div")
+        sectionPopup.setAttribute("id", "sectionPopup")
+        sectionPopup.innerHTML = `
+            <textarea id="createSection" placeholder="Add a section..."></textarea>
+            <div id="taskPopupFooter">
+                <i class="fa-solid fa-arrow-left" onclick="cancelSection()"></i>
+                <i class="fa-solid fa-square-check" onclick="saveSection()"></i>
+            </div>
+        `;
+        document.body.appendChild(sectionPopup)
+        popup = true
+    }
+}
+
+function cancelSection(){
+    const sectionPopup = document.getElementById("sectionPopup")
+    if(sectionPopup) sectionPopup.remove()
+    popup = false
+}
+
+function saveSection(){
+    
+    const existingSections = JSON.parse(localStorage.getItem('sections')) || []
+
+
+    const sectionPopup = document.getElementById("sectionPopup")
+    const sectionText = document.getElementById("createSection").value.trim()
+
+    if(sectionText.trim() !== ''){
+        const section = {
+            id: new Date().getTime(),
+            text: sectionText,
+            numTasks: 0
+        } 
+    
+
+        existingSections.push(section)
+
+        localStorage.setItem('sections', JSON.stringify(existingSections))
+        document.getElementById("createSection").value = ''
+    }
+    
+    sectionPopup.remove()
+    displaySections()
+    popup = false
+}
+*/
 
 function bulkDelete(){
     popup = true //temp solution, since removing eventListener not working.
@@ -446,25 +552,19 @@ function cancelBulk(){
             para.classList.remove("bulkSelected")
     })
 
-    document.body.addEventListener('keydown', (e) => {
-        if (e.altKey && 'ws'.indexOf(e.key) !== -1) {
-          e.preventDefault();
-        }
-        if(e.altKey)document.addEventListener("keydown", moveTask)
-      });
+    preventEvent = false //will allow moving tasks again
 
     const footer = document.getElementById("footer")
     footer.innerHTML=`
     <i class="fa-solid fa-gear" onclick="settings()"></i>
     <i class="fa-solid fa-plus" onclick="addTask()"></i>
+    <i class="fa-solid fa-plus-minus" onclick="addSection()"></i>
     <i class="fa-solid fa-trash-can-arrow-up" onclick="bulkDelete()"></i>
     `
     popup = false //temp solution
     displayTasks() //reinstates the edit event
 }
-//cancel button and enter button => revert eventlisteners
 
-//make sure to block if any popup is open => same for others
 function settings(){
     const deleteAllPopup = document.getElementById("deletePopup")
     const keybindsPopup = document.getElementById("keybindsPopup")
