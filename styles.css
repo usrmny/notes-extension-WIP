@@ -52,7 +52,7 @@ body{
     background: var(--primary-color);
 }
 
-.footer {
+#footer {
     width:100%;
     height:6vh;
     display: flex;
@@ -62,7 +62,7 @@ body{
     background: var(--footer-bg)
 }
 
-.footer i{
+#footer i{
     cursor: pointer;
 }
 
@@ -148,15 +148,16 @@ body{
 
 #taskText, #subTask, #taskNote {
     font-size: 18px;
-    font-family: 'Courier New', Courier, monospace;
-    padding-left: 8px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    height: 100%;
+
     min-height: 6vh;
     width: 100%;
-    display: block;
-    margin-top: 10px;
+    margin: 20px;
+    padding-left: 8px;
+
+    display: flex;
+    align-items: center;
+    word-break: break-all;
+    white-space: pre-wrap;
 }
 
 #task i{
@@ -165,6 +166,26 @@ body{
     height: 100%;
     margin: 10px 30px;
 }
+
+/*FONTS*/
+
+.courierNew{
+    font-family: 'Courier New';
+}
+
+.franklin{
+    font-family: 'Franklin Gothic Medium';
+}
+
+.arial{
+    font-family: Arial;
+}
+
+.timesNewRoman{
+    font-family: 'Times New Roman';
+}
+
+/*FONTS END*/
 
 .alignVertical{
     display: flex;
@@ -269,7 +290,7 @@ body{
     margin: 5px;
 }
 
-.dragging {
+.dragging, .bulkSelected{
     box-sizing: border-box;
     border: 2px solid var(--btn-border);
     box-shadow: 2px var(--drag-shadow);
@@ -278,7 +299,7 @@ body{
     background: var(--drag-bg);
 }
 
-.dragging #taskText{
+.dragging #taskText, .dragging #taskNote, .dragging #subTask, .bulkSelected #taskText, .bulkSelected #taskNote, .bulkSelected #subTask {
     color: var(--primary-color);
 }
 
