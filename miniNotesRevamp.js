@@ -60,6 +60,9 @@ function saveTask(){
             text: taskText,
             note: taskNote,
             subText: taskSubText,
+            textFont: "courierNew",
+            noteFont: "courierNew",
+            subTextFont: "courierNew",
             checked: false,
             showExtra: false,
             item: item
@@ -81,10 +84,11 @@ function saveTask(){
 
 
 //Buttons don't change appearance without '${task.checked ? 'checked' : ''}'???
+//gotta do json for fonts? => can't remember otherwise :C
 function displayTasks(){
 
     const taskList = document.getElementById('list')
-    taskList.innerHTML = '' //remove for displaySections
+    taskList.innerHTML = '' 
 
     const tasks = JSON.parse(localStorage.getItem('tasks')) || []
     if(tasks.length > 0){
@@ -100,9 +104,12 @@ function displayTasks(){
                 </div>
                 <i class="fa-solid fa-caret-down" onclick="showSubTasks(${task.id})"></i>
                 `;
+            findFont(task.id, listItem)
             listItem.querySelector("div").addEventListener("click", () => editTask(task.id)) //must do () => so its not called immediately!
             //so it can be removed with bulkDelete()
             //innerHTML causes events to not be added in a list to track all events. => can't remove (imagine as embedded to the element)
+
+        
 
 
             if(task.showExtra){
@@ -142,67 +149,23 @@ function displayTasks(){
     popup = false;
 }
 
-/*
-function displaySections(){
-    const taskList = document.getElementById('list')
-    taskList.innerHTML = ''
+function findFont(taskId, item){
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || []
+    const task = tasks.filter(task => task.id == taskId)
+    const text = item.getElementById("taskText")
 
-    const sections = JSON.parse(localStorage.getItem('sections')) || []
-    if(sections.length > 0){
-        tasks.forEach(task => {
-            const listItem = document.createElement("li") 
-            listItem.setAttribute("id", "task")
-            listItem.setAttribute("item-id", task.item)
-            //listItem.setAttribute("draggable", true)
-            listItem.innerHTML = `
-                <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
-                <div class="alignVertical">
-                    <p id="taskText" class="unchecked" placeholder="Add a task...">${task.text} </p>
-                </div>
-                <i class="fa-solid fa-caret-down" onclick="showSubTasks(${task.id})"></i>
-                `;
-            listItem.querySelector("div").addEventListener("click", () => editTask(task.id)) //must do () => so its not called immediately!
-            //so it can be removed with bulkDelete()
-            //innerHTML causes events to not be added in a list to track all events. => can't remove (imagine as embedded to the element)
-
-
-            if(task.showExtra){
-                const div = listItem.querySelector('div');
-                let isChecked = task.checked
-                if(task.note !== "") {
-                    const note = document.createElement("p")
-                    note.innerHTML=`${task.note}`
-                    note.setAttribute("id", "taskNote")
-                    switch (isChecked){
-                        case true: note.setAttribute("class", "checked")
-                                    break;
-                        default: note.setAttribute("class", "unchecked")
-                    }
-                    div.insertAdjacentElement("BeforeEnd", note)
-                }
-                if(task.subText !== "") {
-                    const subTask = document.createElement("p")
-                    subTask.innerHTML=`${task.subText}`
-                    subTask.setAttribute("id", "subTask")
-                    switch (isChecked){
-                        case true: subTask.setAttribute("class", "checked")
-                                    break;
-                        default: subTask.setAttribute("class", "unchecked")
-                    }
-                    div.insertAdjacentElement("BeforeEnd", subTask)
-                }
-            }
-
-            const text = listItem.querySelector('p')
-            if(task.checked) text.setAttribute("class", "checked")
-            else text.setAttribute("class", "unchecked")
-
-            taskList.appendChild(listItem)
-        })
+    text.classList.add(task.textFont)
+    if(item.getElementById("taskNote")){
+        const note = item.getElementById("taskNote")
+        note.classList.add(task.noteFont)
     }
-    else displayTasks()
+    if(item.getElementById("subTask")){
+        const subTask = item.getElementById("subTask")
+        subTask.classList.add(task.subTaskFont)
+    }
+
+    
 }
-*/
 
 function showSubTasks(taskId){
     let tasks = JSON.parse(localStorage.getItem('tasks')) || []
@@ -215,6 +178,9 @@ function showSubTasks(taskId){
                     text: task.text,
                     note: task.note,
                     subText: task.subText,
+                    textFont: task.textFont,
+                    noteFont: task.noteFont,
+                    subTextFont: task.subTextFont,
                     checked: task.checked, 
                     showExtra: !taskExpended.showExtra,
                     item: task.item
@@ -238,6 +204,9 @@ function boxClicked(taskId){
                     text: task.text,
                     note: task.note,
                     subText: task.subText,
+                    textFont: task.textFont,
+                    noteFont: task.noteFont,
+                    subTextFont: task.subTextFont,
                     checked: !taskChecked.checked, 
                     showExtra: task.showExtra,
                     item: task.item
@@ -270,6 +239,9 @@ function copyTask(taskId){
         text: taskToCopy.text,
         note: taskToCopy.note,
         subText: taskToCopy.subText,
+        textFont: taskToCopy.textFont,
+        noteFont: taskToCopy.noteFont,
+        subTextFont: taskToCopy.subTextFont,
         checked: taskToCopy.checked,
         showExtra: taskToCopy.showExtra,
         item: item
@@ -298,6 +270,7 @@ function editTask(taskId){
             <textarea id="editTaskSub" placeholder="Add subtask">${taskTextSub}</textarea>
             <div id="editPopupFooter">
                 <i class="fa-solid fa-arrow-left" onclick="cancelEdit()"></i>
+                <i class="fa-solid fa-font" onclick="changeFontEdit(${taskId})"></i>
                 <i class="fa-solid fa-trash-can" onclick="removeTask(${taskId})"></i>
                 <i class="fa-solid fa-clone" onclick="copyTask(${taskId})"></i>
                 <i class="fa-solid fa-square-check" onclick="updateTask(${taskId})"></i>
@@ -320,6 +293,9 @@ function updateTask(taskId){
                 text: document.getElementById("editTask").value,
                 note: document.getElementById("editTaskNote").value,
                 subText: document.getElementById("editTaskSub").value,
+                textFont: task.textFont,
+                noteFont: task.noteFont,
+                subTextFont: task.subTextFont,
                 checked: task.checked,
                 showExtra: task.showExtra,
                 item: task.item
@@ -332,6 +308,50 @@ function updateTask(taskId){
 
     editingPopup.remove()
     displayTasks()
+}
+
+
+function changeFontEdit(taskId){
+    if(!popup){
+        const fontPopup = document.createElement("div")
+        fontPopup.setAttribute("id", "fontPopup")
+        fontPopup.innerHTML = `
+            <div>
+                <select id="textFontDrop">
+                    <option value="courierNew">Courier New</option>
+                    <option value="franklin">Franklin Gothic Medium</option>
+                    <option value="arial">Arial</option>
+                    <option value="timesNewRoman">Times New Roman</option>
+                </select>
+                <select id="noteFontDrop">
+                    <option value="courierNew">Courier New</option>
+                    <option value="franklin">Franklin Gothic Medium</option>
+                    <option value="arial">Arial</option>
+                    <option value="timesNewRoman">Times New Roman</option>
+                </select>
+                <select id="subTextFontDrop">
+                    <option value="courierNew">Courier New</option>
+                    <option value="franklin">Franklin Gothic Medium</option>
+                    <option value="arial">Arial</option>
+                    <option value="timesNewRoman">Times New Roman</option>
+                </select>
+            </div>
+            <div id="taskPopupFooter">
+                <i class="fa-solid fa-arrow-left" onclick="cancelFont()"></i>
+                <i class="fa-solid fa-square-check" onclick="saveFont()"></i>
+            </div>
+        `;
+        document.body.appendChild(fontPopup)
+
+        let tasks = JSON.parse(localStorage.getItem('tasks'))||[]
+        let taskToChange = tasks.filter(task => task.id === taskId)
+
+        const textSelect = document.getElementById('textFontDrop')
+        
+        const noteSelect = document.getElementById('noteFontDrop')
+        const subTextSelect = document.getElementById('subTextFontDrop')
+    }
+   
 }
 
 //both only used for moveTask()
@@ -424,6 +444,9 @@ function savePosition(){
                 text: wanted.text, 
                 note: wanted.note,
                 subText: wanted.subText,
+                textFont: wanted.textFont,
+                noteFont: wanted.noteFont,
+                subTextFont: wanted.subTextFont,
                 checked: wanted.checked,
                 showExtra: wanted.showExtra,
                 item: index - 1 
@@ -436,57 +459,6 @@ function savePosition(){
     displayTasks()  
     popup = false
 }
-
-/*
-function addSection(){
-    if(!popup){
-        const sectionPopup = document.createElement("div")
-        sectionPopup.setAttribute("id", "sectionPopup")
-        sectionPopup.innerHTML = `
-            <textarea id="createSection" placeholder="Add a section..."></textarea>
-            <div id="taskPopupFooter">
-                <i class="fa-solid fa-arrow-left" onclick="cancelSection()"></i>
-                <i class="fa-solid fa-square-check" onclick="saveSection()"></i>
-            </div>
-        `;
-        document.body.appendChild(sectionPopup)
-        popup = true
-    }
-}
-
-function cancelSection(){
-    const sectionPopup = document.getElementById("sectionPopup")
-    if(sectionPopup) sectionPopup.remove()
-    popup = false
-}
-
-function saveSection(){
-    
-    const existingSections = JSON.parse(localStorage.getItem('sections')) || []
-
-
-    const sectionPopup = document.getElementById("sectionPopup")
-    const sectionText = document.getElementById("createSection").value.trim()
-
-    if(sectionText.trim() !== ''){
-        const section = {
-            id: new Date().getTime(),
-            text: sectionText,
-            numTasks: 0
-        } 
-    
-
-        existingSections.push(section)
-
-        localStorage.setItem('sections', JSON.stringify(existingSections))
-        document.getElementById("createSection").value = ''
-    }
-    
-    sectionPopup.remove()
-    displaySections()
-    popup = false
-}
-*/
 
 function bulkDelete(){
     popup = true //temp solution, since removing eventListener not working.
@@ -530,6 +502,9 @@ function submitBulk(){
                 text: taskJson.text, 
                 note: taskJson.note,
                 subText: taskJson.subText,
+                textFont: taskJson.textFont,
+                noteFont: taskJson.noteFont,
+                subTextFont: taskJson.subTextFont,
                 checked: taskJson.checked,
                 showExtra: taskJson.showExtra,
                 item: index - 1 
@@ -558,7 +533,6 @@ function cancelBulk(){
     footer.innerHTML=`
     <i class="fa-solid fa-gear" onclick="settings()"></i>
     <i class="fa-solid fa-plus" onclick="addTask()"></i>
-    <i class="fa-solid fa-plus-minus" onclick="addSection()"></i>
     <i class="fa-solid fa-trash-can-arrow-up" onclick="bulkDelete()"></i>
     `
     popup = false //temp solution
@@ -771,5 +745,56 @@ function draggingTask(e){
 
     box.addEventListener("dragover", initBox)
     box.addEventListener("dragenter", e => e.preventDefault())
+}
+*/
+
+/*
+function addSection(){
+    if(!popup){
+        const sectionPopup = document.createElement("div")
+        sectionPopup.setAttribute("id", "sectionPopup")
+        sectionPopup.innerHTML = `
+            <textarea id="createSection" placeholder="Add a section..."></textarea>
+            <div id="taskPopupFooter">
+                <i class="fa-solid fa-arrow-left" onclick="cancelSection()"></i>
+                <i class="fa-solid fa-square-check" onclick="saveSection()"></i>
+            </div>
+        `;
+        document.body.appendChild(sectionPopup)
+        popup = true
+    }
+}
+
+function cancelSection(){
+    const sectionPopup = document.getElementById("sectionPopup")
+    if(sectionPopup) sectionPopup.remove()
+    popup = false
+}
+
+function saveSection(){
+    
+    const existingSections = JSON.parse(localStorage.getItem('sections')) || []
+
+
+    const sectionPopup = document.getElementById("sectionPopup")
+    const sectionText = document.getElementById("createSection").value.trim()
+
+    if(sectionText.trim() !== ''){
+        const section = {
+            id: new Date().getTime(),
+            text: sectionText,
+            numTasks: 0
+        } 
+    
+
+        existingSections.push(section)
+
+        localStorage.setItem('sections', JSON.stringify(existingSections))
+        document.getElementById("createSection").value = ''
+    }
+    
+    sectionPopup.remove()
+    displaySections()
+    popup = false
 }
 */
