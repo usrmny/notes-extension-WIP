@@ -13,14 +13,9 @@ Current Functionalities:
 - Delete All button
 - Duplicate item button
 - Bulk Delete
-
-Working On: 
 - Ability to change fonts
+
+May Add Someday: 
 - Way to section off items
 - Ability to add multiple sub items
 - Connect the notion api to read deadlines from notion and inscribe them in notes on request by user
-- Update icons
-
-Current Known Bugs: 
-- Not selecting anything when changing fonts causes the respective elements to receive a class of undefined.
-- css of the popup for changing fonts needs to be fixed.
