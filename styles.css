@@ -64,6 +64,7 @@ body{
 
 #footer i{
     cursor: pointer;
+    margin-top: 25px;
 }
 
 #taskPopup, #editPopup, #settingsPopup, #deletePopup,
@@ -125,7 +126,7 @@ body{
     align-items: center;
 }
 
-#taskPopupFooter i, #editPopupFooter i, .fa-caret-down, #fontPopupFooter i{
+#taskPopupFooter i, #editPopupFooter i, #fontPopupFooter i{
     font-size: 22px;
     cursor: pointer;
 }
@@ -165,26 +166,34 @@ body{
     box-sizing: border-box;
     width: 20px;
     height: 100%;
+    font-size: 22px;
     margin: 10px 30px;
+    cursor: pointer;
 }
 
 #fontPopupBody{
-    height: 70%;
+    height: 80%;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
-    grid-template-rows: repeat(2, auto);   /* 2 rows */
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
 }
 
+#fontPopupBody div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
 #fontPopup select{
-    width: 70%;
-    height: 30px;
-    
+    width: 90%;
+    min-height: 30px;
+    text-align: center;
     margin: 20px;
 }
 
 #fontPopup p{
-    width: 50%;
+    width: 70%;
     height: 20px;
 
     margin:10px;
@@ -199,8 +208,8 @@ body{
     font-family: 'Courier New';
 }
 
-.franklin{
-    font-family: 'Franklin Gothic Medium';
+.impact{
+    font-family: Impact;
 }
 
 .arial{
