@@ -102,14 +102,19 @@ function displayTasks(){
                 <div class="alignVertical">
                     <p id="taskText" class="unchecked courierNew" placeholder="Add a task...">${task.text} </p>
                 </div>
-                <i class="fa-solid fa-caret-down" onclick="showSubTasks(${task.id})"></i>
                 `;
             listItem.querySelector("div").addEventListener("click", () => editTask(task.id)) //must do () => so its not called immediately!
             //so it can be removed with bulkDelete()
             //innerHTML causes events to not be added in a list to track all events. => can't remove (imagine as embedded to the element)
+            const caret = document.createElement('i')
+            const div = listItem.querySelector('div');
+
+            caret.addEventListener('click', () => showSubTasks(task.id))
+            div.insertAdjacentElement('afterend', caret)
+            
 
             if(task.showExtra){
-                const div = listItem.querySelector('div');
+                caret.setAttribute('class', 'fa-solid fa-caret-left')
                 let isChecked = task.checked
                 if(task.note !== "") {
                     const note = document.createElement("p")
@@ -138,6 +143,7 @@ function displayTasks(){
                     div.insertAdjacentElement("BeforeEnd", subTask)
                 }
             }
+            else caret.setAttribute('class', 'fa-solid fa-caret-down')
 
             const text = listItem.querySelector('p')
             if(task.checked) text.setAttribute("class", "checked")
@@ -320,27 +326,33 @@ function changeFontEdit(taskId){
     fontPopup.setAttribute("id", "fontPopup")
     fontPopup.innerHTML = `
         <div id="fontPopupBody">
-            <p>Text Font</p>
-            <p>Note Font</p>
-            <p>Sub Text Font</p>
-            <select id="textFontDrop">
-                <option value="courierNew">Courier New</option>
-                <option value="franklin">Franklin Gothic Medium</option>
-                <option value="arial">Arial</option>
-                <option value="timesNewRoman">Times New Roman</option>
-            </select>
-            <select id="noteFontDrop">
-                <option value="courierNew">Courier New</option>
-                <option value="franklin">Franklin Gothic Medium</option>
-                <option value="arial">Arial</option>
-                <option value="timesNewRoman">Times New Roman</option>
-            </select>
-            <select id="subTextFontDrop">
-                <option value="courierNew">Courier New</option>
-                <option value="franklin">Franklin Gothic Medium</option>
-                <option value="arial">Arial</option>
-                <option value="timesNewRoman">Times New Roman</option>
-            </select>
+            <div>
+                <p>Text Font</p>
+                <select id="textFontDrop">
+                    <option value="arial">Arial</option>
+                    <option selected value="courierNew">Courier New</option>
+                    <option value="impact">Impact</option>
+                    <option value="timesNewRoman">Times New Roman</option>
+                </select>
+            </div>
+            <div>
+                <p>Note Font</p>
+                <select id="noteFontDrop">
+                    <option value="arial">Arial</option>
+                    <option selected value="courierNew">Courier New</option>
+                    <option value="impact">Impact</option>
+                    <option value="timesNewRoman">Times New Roman</option>
+                </select>
+            </div>
+            <div>
+                <p>Sub Text Font</p>
+                <select id="subTextFontDrop">
+                    <option value="arial">Arial</option>
+                    <option selected value="courierNew">Courier New</option>
+                    <option value="impact">Impact</option>
+                    <option value="timesNewRoman">Times New Roman</option>
+                </select>
+            </div>
         </div>
         <div id="fontPopupFooter">
             <i class="fa-solid fa-arrow-left" onclick="cancelFont()"></i>
@@ -350,7 +362,7 @@ function changeFontEdit(taskId){
     document.body.appendChild(fontPopup)
 
     let tasks = JSON.parse(localStorage.getItem('tasks'))||[]
-    let taskToChange = tasks.filter(task => task.id === taskId)
+    let taskToChange = tasks.find(task => task.id === taskId)
 
     const textSelect = document.getElementById('textFontDrop')
     const noteSelect = document.getElementById('noteFontDrop')
@@ -371,12 +383,11 @@ function cancelFont(){
 
 function submitFont(taskId){
     let tasks = JSON.parse(localStorage.getItem('tasks'))||[]
-    let taskToChange = tasks.filter(task => task.id === taskId)
+    let taskToChange = tasks.find(task => task.id === taskId)
     
     let textF = document.getElementById("textFontDrop").value
     let noteF = document.getElementById("noteFontDrop").value
     let subTextF = document.getElementById("subTextFontDrop").value
-    console.log(taskToChange.item)
 
     if(textF == "")
         textF = taskToChange.textFont
