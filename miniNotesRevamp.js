@@ -100,17 +100,13 @@ function displayTasks(){
             listItem.innerHTML = `
                 <input class="checkbox" type="checkbox" onchange="boxClicked(${task.id})" ${task.checked ? 'checked' : ''}/> 
                 <div class="alignVertical">
-                    <p id="taskText" class="unchecked" placeholder="Add a task...">${task.text} </p>
+                    <p id="taskText" class="unchecked courierNew" placeholder="Add a task...">${task.text} </p>
                 </div>
                 <i class="fa-solid fa-caret-down" onclick="showSubTasks(${task.id})"></i>
                 `;
-            findFont(task.id, listItem)
             listItem.querySelector("div").addEventListener("click", () => editTask(task.id)) //must do () => so its not called immediately!
             //so it can be removed with bulkDelete()
             //innerHTML causes events to not be added in a list to track all events. => can't remove (imagine as embedded to the element)
-
-        
-
 
             if(task.showExtra){
                 const div = listItem.querySelector('div');
@@ -120,9 +116,11 @@ function displayTasks(){
                     note.innerHTML=`${task.note}`
                     note.setAttribute("id", "taskNote")
                     switch (isChecked){
-                        case true: note.setAttribute("class", "checked")
-                                    break;
-                        default: note.setAttribute("class", "unchecked")
+                        case true: 
+                            note.setAttribute("class", "checked")
+                            break;
+                        default: 
+                            note.setAttribute("class", "unchecked")
                     }
                     div.insertAdjacentElement("BeforeEnd", note)
                 }
@@ -131,9 +129,11 @@ function displayTasks(){
                     subTask.innerHTML=`${task.subText}`
                     subTask.setAttribute("id", "subTask")
                     switch (isChecked){
-                        case true: subTask.setAttribute("class", "checked")
-                                    break;
-                        default: subTask.setAttribute("class", "unchecked")
+                        case true: 
+                        subTask.setAttribute("class", "checked")
+                        break;
+                        default: 
+                            subTask.setAttribute("class", "unchecked")
                     }
                     div.insertAdjacentElement("BeforeEnd", subTask)
                 }
@@ -143,25 +143,27 @@ function displayTasks(){
             if(task.checked) text.setAttribute("class", "checked")
             else text.setAttribute("class", "unchecked")
 
+            findFont(task.textFont, task.noteFont, task.subTextFont, listItem)
+
             taskList.appendChild(listItem)
         })
     }
     popup = false;
 }
 
-function findFont(taskId, item){
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || []
-    const task = tasks.filter(task => task.id == taskId)
-    const text = item.getElementById("taskText")
+function findFont(textFont, noteFont, subTextFont, item){
 
-    text.classList.add(task.textFont)
-    if(item.getElementById("taskNote")){
-        const note = item.getElementById("taskNote")
-        note.classList.add(task.noteFont)
+    const text = item.querySelector('#taskText') 
+    text.classList.add(textFont)
+
+    const note = item.querySelector('#taskNote')
+    if(note){
+        note.classList.add(noteFont)
     }
-    if(item.getElementById("subTask")){
-        const subTask = item.getElementById("subTask")
-        subTask.classList.add(task.subTaskFont)
+
+    const subTask = item.querySelector('#subTask')
+    if(subTask){
+        subTask.classList.add(subTextFont)
     }
 
     
@@ -312,46 +314,97 @@ function updateTask(taskId){
 
 
 function changeFontEdit(taskId){
-    if(!popup){
-        const fontPopup = document.createElement("div")
-        fontPopup.setAttribute("id", "fontPopup")
-        fontPopup.innerHTML = `
-            <div>
-                <select id="textFontDrop">
-                    <option value="courierNew">Courier New</option>
-                    <option value="franklin">Franklin Gothic Medium</option>
-                    <option value="arial">Arial</option>
-                    <option value="timesNewRoman">Times New Roman</option>
-                </select>
-                <select id="noteFontDrop">
-                    <option value="courierNew">Courier New</option>
-                    <option value="franklin">Franklin Gothic Medium</option>
-                    <option value="arial">Arial</option>
-                    <option value="timesNewRoman">Times New Roman</option>
-                </select>
-                <select id="subTextFontDrop">
-                    <option value="courierNew">Courier New</option>
-                    <option value="franklin">Franklin Gothic Medium</option>
-                    <option value="arial">Arial</option>
-                    <option value="timesNewRoman">Times New Roman</option>
-                </select>
-            </div>
-            <div id="taskPopupFooter">
-                <i class="fa-solid fa-arrow-left" onclick="cancelFont()"></i>
-                <i class="fa-solid fa-square-check" onclick="saveFont()"></i>
-            </div>
-        `;
-        document.body.appendChild(fontPopup)
 
-        let tasks = JSON.parse(localStorage.getItem('tasks'))||[]
-        let taskToChange = tasks.filter(task => task.id === taskId)
+    document.getElementById('editPopup').remove()
+    const fontPopup = document.createElement("div")
+    fontPopup.setAttribute("id", "fontPopup")
+    fontPopup.innerHTML = `
+        <div id="fontPopupBody">
+            <p>Text Font</p>
+            <p>Note Font</p>
+            <p>Sub Text Font</p>
+            <select id="textFontDrop">
+                <option value="courierNew">Courier New</option>
+                <option value="franklin">Franklin Gothic Medium</option>
+                <option value="arial">Arial</option>
+                <option value="timesNewRoman">Times New Roman</option>
+            </select>
+            <select id="noteFontDrop">
+                <option value="courierNew">Courier New</option>
+                <option value="franklin">Franklin Gothic Medium</option>
+                <option value="arial">Arial</option>
+                <option value="timesNewRoman">Times New Roman</option>
+            </select>
+            <select id="subTextFontDrop">
+                <option value="courierNew">Courier New</option>
+                <option value="franklin">Franklin Gothic Medium</option>
+                <option value="arial">Arial</option>
+                <option value="timesNewRoman">Times New Roman</option>
+            </select>
+        </div>
+        <div id="fontPopupFooter">
+            <i class="fa-solid fa-arrow-left" onclick="cancelFont()"></i>
+            <i class="fa-solid fa-square-check" onclick="submitFont(${taskId})"></i>
+        </div>
+    `; //layout is a grid
+    document.body.appendChild(fontPopup)
 
-        const textSelect = document.getElementById('textFontDrop')
-        
-        const noteSelect = document.getElementById('noteFontDrop')
-        const subTextSelect = document.getElementById('subTextFontDrop')
-    }
-   
+    let tasks = JSON.parse(localStorage.getItem('tasks'))||[]
+    let taskToChange = tasks.filter(task => task.id === taskId)
+
+    const textSelect = document.getElementById('textFontDrop')
+    const noteSelect = document.getElementById('noteFontDrop')
+    const subTextSelect = document.getElementById('subTextFontDrop')
+
+    textSelect.value = taskToChange.textFont
+    noteSelect.value = taskToChange.noteFont
+    subTextSelect.value = taskToChange.subTextFont
+}
+
+
+function cancelFont(){
+    const fontPopup = document.getElementById("fontPopup")
+    if(fontPopup) fontPopup.remove()
+    popup = false
+    displayTasks()
+}
+
+function submitFont(taskId){
+    let tasks = JSON.parse(localStorage.getItem('tasks'))||[]
+    let taskToChange = tasks.filter(task => task.id === taskId)
+    
+    let textF = document.getElementById("textFontDrop").value
+    let noteF = document.getElementById("noteFontDrop").value
+    let subTextF = document.getElementById("subTextFontDrop").value
+    console.log(taskToChange.item)
+
+    if(textF == "")
+        textF = taskToChange.textFont
+    if(noteF == "")
+        noteF = taskToChange.noteFont
+    if(subTextF == "")
+        subTextF = taskToChange.subTextFont
+
+    let updatedFonts = tasks.map(task => {
+        if(task.id == taskId)
+            return {
+                id: task.id, 
+                text: task.text,
+                note: task.note,
+                subText: task.subText,
+                textFont: textF,
+                noteFont: noteF,
+                subTextFont: subTextF,
+                checked: task.checked,
+                showExtra: task.showExtra,
+                item: task.item
+            
+            }
+        else return task
+    })
+
+    localStorage.setItem('tasks', JSON.stringify(updatedFonts))
+    cancelFont()
 }
 
 //both only used for moveTask()
