@@ -22,4 +22,5 @@ Working On:
 - Update icons
 
 Current Known Bugs: 
-- All fixed for now.
+- Not selecting anything when changing fonts causes the respective elements to receive a class of undefined.
+- css of the popup for changing fonts needs to be fixed.
